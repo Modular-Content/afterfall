@@ -1,0 +1,127 @@
+
+-- Called when a player's character has unloaded.
+function cwPickupObjects:PlayerCharacterUnloaded(player)
+	self:ForceDropEntity(player)
+end
+
+-- Called to get the entity that a player is holding.
+function cwPickupObjects:PlayerGetHoldingEntity(player)
+	if IsValid(player.cwHoldingEnt) then return player.cwHoldingEnt end
+end
+
+-- Called when a player attempts to throw a punch.
+function cwPickupObjects:PlayerCanThrowPunch(player)
+	if IsValid(player.cwHoldingEnt) or player.nextPunchTime and player.nextPunchTime >= CurTime() then return false end
+end
+
+-- Called when a player's weapons should be given.
+function cwPickupObjects:PlayerGiveWeapons(player)
+	if Clockwork.config:Get("take_physcannon"):Get() then
+		Clockwork.player:TakeSpawnWeapon(player, "weapon_physcannon")
+	end
+end
+
+-- Called to get whether an entity is being held.
+function cwPickupObjects:GetEntityBeingHeld(entity)
+	if IsValid(entity.cwHoldingGrab) and not entity:IsPlayer() then return true end
+end
+
+-- Called when Clockwork config has changed.
+function cwPickupObjects:ClockworkConfigChanged(key, data, previousValue, newValue)
+	if key == "take_physcannon" then
+		for k, v in pairs(cwPlayer.GetAll()) do
+			if newValue then
+				Clockwork.player:TakeSpawnWeapon(v, "weapon_physcannon")
+			else
+				Clockwork.player:GiveSpawnWeapon(v, "weapon_physcannon")
+			end
+		end
+	end
+end
+
+-- Called when a player's ragdoll attempts to take damage.
+function cwPickupObjects:PlayerRagdollCanTakeDamage(player, ragdoll, inflictor, attacker, hitGroup, damageInfo)
+	if ragdoll.cwNextTakeDmg and CurTime() < ragdoll.cwNextTakeDmg then
+		return false
+	elseif IsValid(ragdoll.cwHoldingGrab) then
+		if not damageInfo:IsExplosionDamage() and not damageInfo:IsBulletDamage() then
+			if not damageInfo:IsDamageType(DMG_CLUB) and not damageInfo:IsDamageType(DMG_SLASH) then return false end
+		end
+	end
+end
+
+-- Called when a player enters a vehicle.
+function cwPickupObjects:PlayerEnteredVehicle(player, vehicle, class)
+	if IsValid(player.cwHoldingEnt) and player.cwHoldingEnt == vehicle then
+		self:ForceDropEntity(player)
+	end
+end
+
+-- Called when a player attempts to get up.
+function cwPickupObjects:PlayerCanGetUp(player)
+	if player:GetNetVar("IsDragged") then return false end
+end
+
+-- Called when a player's shared variables should be set.
+function cwPickupObjects:PlayerSetNetVars(player, curTime)
+	if player:IsRagdolled() and Clockwork.player:GetUnragdollTime(player) then
+		local entity = player:GetRagdollEntity()
+
+		if IsValid(entity) then
+			if IsValid(entity.cwHoldingGrab) or entity:IsBeingHeld() then
+				Clockwork.player:PauseUnragdollTime(player)
+				player:SetNetVar("IsDragged", true)
+			elseif player:GetNetVar("IsDragged") then
+				Clockwork.player:StartUnragdollTime(player)
+				player:SetNetVar("IsDragged", false)
+			end
+		else
+			player:SetNetVar("IsDragged", false)
+		end
+	else
+		player:SetNetVar("IsDragged", false)
+	end
+end
+
+-- Called when a player presses a key.
+function cwPickupObjects:KeyPress(player, key)
+	if player:IsUsingHands() then
+		if not IsValid(player.cwHoldingEnt) then
+			if key == IN_ATTACK2 then
+				local trace = player:GetEyeTraceNoCursor()
+				local entity = trace.Entity
+				local bCanPickup = nil
+
+				if IsValid(entity) and trace.HitPos:Distance(player:GetShootPos()) <= 96 and not entity:IsPlayer() and not entity:IsNPC() then
+					if Clockwork.plugin:Call("CanHandsPickupEntity", player, entity, trace) then
+						bCanPickup = true
+					end
+
+					local bIsDoor = Clockwork.entity:IsDoor(entity)
+
+					if bCanPickup and not bIsDoor and not player:InVehicle() then
+						self:ForcePickup(player, entity, trace)
+					elseif bIsDoor then
+						local hands = player:GetActiveWeapon()
+						hands:SecondaryAttack()
+					end
+				end
+			end
+		elseif key == IN_ATTACK then
+			self:ForceThrowEntity(player)
+		elseif key == IN_RELOAD then
+			self:ForceDropEntity(player)
+		end
+	end
+end
+
+-- Called when a player attempts to pickup an object.
+function cwPickupObjects:CanHandsPickupEntity(player, entity, trace)
+	if IsValid(entity:GetPhysicsObject()) and entity:GetSolid() == SOLID_VPHYSICS then
+		if entity:GetClass() == "prop_ragdoll" or entity:GetPhysicsObject():GetMass() <= 100 then
+			if entity:GetPhysicsObject():IsMoveable() and not IsValid(entity.cwHoldingGrab) then
+				if not entity.noHandsPickup then return true end
+			end
+		end
+	end
+end

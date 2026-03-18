@@ -1,0 +1,9 @@
+"afterfall"
+{
+	"title"			"AfterFall: HL2 RP"
+	"author"		"Modular Content"
+	"description"	"A roleplaying schema by Modular Content set in the Half-Life universe."
+	"version"		"1"
+	"menusystem"	"1"
+	"workshopid"	"108727894"
+}

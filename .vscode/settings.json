@@ -1,0 +1,27 @@
+{
+    "Lua.workspace.library": [
+        "./src",
+        "${addons}/garrysmod/module/library"
+    ],
+    "Lua.runtime.version": "LuaJIT",
+    "Lua.runtime.special": {
+        "include": "require",
+        "IncludeCS": "require"
+    },
+    "Lua.runtime.nonstandardSymbol": [
+	    "continue",
+	    "&&",
+	    "||",
+	    "!=",
+	    "!",
+	    "//",
+        "/**/"
+    ],
+    "Lua.diagnostics.disable": [
+        "duplicate-set-field",
+        "inject-field",
+        "lowercase-global"
+    ],
+    "Lua.workspace.checkThirdParty": false,
+    "Lua.workspace.maxPreload": 10000
+}

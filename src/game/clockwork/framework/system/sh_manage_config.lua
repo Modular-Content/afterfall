@@ -1,0 +1,296 @@
+local Clockwork = Clockwork
+
+if CLIENT then
+	local SYSTEM = Clockwork.system:New("ManageConfig")
+
+	SYSTEM.image = "clockwork/system/config"
+	SYSTEM.toolTip = "ManageConfigHelp"
+	SYSTEM.doesCreateForm = false
+
+	-- Called to get whether the local player has access to the system.
+	function SYSTEM:HasAccess()
+		return LocalPlayer():IsSuperAdmin()
+	end
+
+	-- Called when the system should be displayed.
+	function SYSTEM:OnDisplay(systemPanel, systemForm)
+		self.adminValues = nil
+
+		self.infoText = vgui.Create("cwInfoText", systemPanel)
+		self.infoText:SetText(L("ConfigMenuHelp"))
+		self.infoText:SetInfoColor("blue")
+		self.infoText:DockMargin(0, 0, 0, 8)
+		systemPanel.panelList:AddItem(self.infoText)
+
+		self.configForm = vgui.Create("cwBasicForm", systemPanel)
+		self.configForm:SetText(L("ConfigMenuTitle"))
+		self.configForm:SetPadding(8)
+		self.configForm:SetSpacing(8)
+		self.configForm:SetAutoSize(true)
+		systemPanel.panelList:AddItem(self.configForm)
+
+		self.editForm = vgui.Create("cwBasicForm", systemPanel)
+		self.editForm:SetText("")
+		self.editForm:SetPadding(8)
+		self.editForm:SetSpacing(8)
+		self.editForm:SetVisible(false)
+		self.editForm:SetAutoSize(true)
+		systemPanel.panelList:AddItem(self.editForm)
+
+		if not self.activeKey then
+			netstream.Start("SystemCfgKeys", true)
+		end
+
+		self.listView = vgui.Create("DListView")
+		self.listView:AddColumn(L("ConfigMenuListName"))
+		self.listView:AddColumn(L("ConfigMenuListKey"))
+		self.listView:AddColumn(L("ConfigMenuListAddedBy"))
+		self.listView:SetMultiSelect(false)
+		self.listView:SetTall(256)
+		self:PopulateComboBox()
+
+		self.allConfigKeys = table.Copy(self.configKeys or {})
+
+		self.searchBox = vgui.Create("DTextEntry", self.configForm)
+		self.searchBox:SetPlaceholderText("Search config...")
+		self.searchBox.OnChange = function(textEntry)
+			local query = string.lower(textEntry:GetValue() or "")
+			self.listView:Clear() -- clear all current rows
+
+			for _, v in ipairs(self.allConfigKeys) do
+				local adminValues = Clockwork.config:GetFromSystem(v)
+				if adminValues then
+					local name = string.lower(L(adminValues.name))
+					local key  = string.lower(v)
+
+					if query == "" or string.find(name, query, 1, true) or string.find(key, query, 1, true) then
+						local line = self.listView:AddLine(L(adminValues.name), v, L(adminValues.category))
+						line:SetTooltip(L(adminValues.help))
+						line.key = v
+					end
+				end
+			end
+			self.listView:SortByColumn(1)
+		end
+		self.configForm:AddItem(self.searchBox)
+
+		function self.listView.OnRowSelected(parent, lineID, line)
+			netstream.Start("SystemCfgValue", line.key)
+		end
+
+		self.configForm:AddItem(self.listView)
+	end
+
+	function SYSTEM:PopulateConfigBox()
+		self.editForm:Clear(true)
+
+		if self.activeKey then
+			self.adminValues = Clockwork.config:GetFromSystem(self.activeKey.key)
+			self.infoText:SetText(L("ConfigMenuStartToEdit"))
+		end
+
+		if self.editForm and not self.editForm:IsVisible() then
+			self.editForm:SetVisible(true)
+		end
+
+		if self.adminValues then
+			for k, v in pairs(string.Explode("\n", L(self.adminValues.help))) do
+				self.editForm:Help(v)
+			end
+
+			self.editForm:SetText(L(self.adminValues.name))
+
+			if self.activeKey.value ~= nil then
+				local mapEntry = self.editForm:TextEntry(L("ConfigMenuMapText"))
+				local valueType = type(self.activeKey.value)
+
+				if valueType == "string" then
+					local textEntry = self.editForm:TextEntry(L("ConfigMenuValueText"))
+					textEntry:SetValue(self.activeKey.value)
+
+					local okayButton = self.editForm:Button(L("Okay"))
+
+					-- Called when the button is clicked.
+					function okayButton.DoClick(okayButton)
+						netstream.Start("SystemCfgSet", {
+							key = self.activeKey.key,
+							value = textEntry:GetValue(),
+							useMap = mapEntry:GetValue()
+						})
+					end
+				elseif valueType == "number" then
+					local numSlider = self.editForm:NumSlider(L("ConfigMenuValueText"), nil, self.adminValues.minimum, self.adminValues.maximum, self.adminValues.decimals)
+					numSlider:SetValue(self.activeKey.value)
+
+					local okayButton = self.editForm:Button(L("Okay"))
+
+					-- Called when the button is clicked.
+					function okayButton.DoClick(okayButton)
+						netstream.Start("SystemCfgSet", {
+							key = self.activeKey.key,
+							value = numSlider:GetValue(),
+							useMap = mapEntry:GetValue()
+						})
+					end
+				elseif valueType == "boolean" then
+					local checkBox = self.editForm:CheckBox(L("ConfigMenuOnText"))
+					checkBox:SetValue(self.activeKey.value)
+
+					local okayButton = self.editForm:Button(L("Okay"))
+
+					-- Called when the button is clicked.
+					function okayButton.DoClick(okayButton)
+						netstream.Start("SystemCfgSet", {
+							key = self.activeKey.key,
+							value = checkBox:GetChecked(),
+							useMap = mapEntry:GetValue()
+						})
+					end
+				end
+				local restoreToDefault = self.editForm:Button(L("RestoreToDefault"))
+				restoreToDefault:SetTextColor(Clockwork.option:GetColor("red"))
+				function restoreToDefault.DoClick(restoreToDefault)
+					netstream.Start("SystemCfgSet", {
+						key = self.activeKey.key,
+						useMap = mapEntry:GetValue(),
+						default = true,
+					})
+				end
+			end
+		end
+	end
+
+	-- A function to populate the system's combo box.
+	function SYSTEM:PopulateComboBox()
+		self.listView:Clear(true)
+
+		if self.configKeys then
+			local defaultConfigItem = nil
+
+			for k, v in pairs(self.configKeys) do
+				local adminValues = Clockwork.config:GetFromSystem(v)
+
+				if adminValues then
+					local comboBoxItem = self.listView:AddLine(L(adminValues.name), v, L(adminValues.category))
+					comboBoxItem:SetTooltip(L(adminValues.help))
+					comboBoxItem.key = v
+
+					if self.activeKey and self.activeKey.key == v then
+						defaultConfigItem = comboBoxItem
+					end
+				end
+			end
+
+			if defaultConfigItem then
+				self.listView:SelectItem(defaultConfigItem, true)
+			end
+
+			self.listView:SortByColumn(1)
+		end
+	end
+
+	SYSTEM:Register()
+
+	netstream.Hook("SystemCfgKeys", function(data)
+		local systemTable = Clockwork.system:FindByID("ManageConfig")
+
+		if systemTable then
+			systemTable.configKeys = data
+			systemTable:PopulateComboBox()
+		end
+	end)
+
+	netstream.Hook("SystemCfgValue", function(data)
+		local systemTable = Clockwork.system:FindByID("ManageConfig")
+
+		if systemTable then
+			systemTable.activeKey = {
+				key = data[1],
+				value = data[2]
+			}
+
+			systemTable:PopulateConfigBox()
+		end
+	end)
+else
+	netstream.Hook("SystemCfgSet", function(player, data)
+		local commandTable = Clockwork.command:FindByID("CfgSetVar")
+
+		if commandTable and Clockwork.player:HasFlags(player, commandTable.access) then
+			local configObject = Clockwork.config:Get(data.key)
+
+			if configObject:IsValid() then
+				local keyPrefix = ""
+				local useMap = data.useMap
+
+				if useMap == "" then
+					useMap = nil
+				end
+
+				if useMap then
+					useMap = string.lower(Clockwork.kernel:Replace(useMap, ".bsp", ""))
+					keyPrefix = useMap .. "'s "
+
+					if not file.Exists("maps/" .. useMap .. ".bsp", "GAME") then
+						Clockwork.player:Notify(player, {"MapNameIsNotValid", useMap})
+
+						return
+					end
+				end
+
+				if not configObject("isStatic") then
+					value = configObject:Set(data.default and configObject:GetDefault() or data.value, useMap)
+
+					if value ~= nil then
+						local printValue = tostring(value)
+
+						if configObject("isPrivate") then
+							if configObject("needsRestart") then
+								Clockwork.player:NotifyAll({"PlayerSetConfigRestart", player:Name(), keyPrefix .. data.key, string.rep("*", string.utf8len(printValue))})
+							else
+								Clockwork.player:NotifyAll({"PlayerSetConfig", player:Name(), keyPrefix .. data.key, string.rep("*", string.utf8len(printValue))})
+							end
+						elseif configObject("needsRestart") then
+							Clockwork.player:NotifyAll({"PlayerSetConfigRestart", player:Name(), keyPrefix .. data.key, printValue})
+						else
+							Clockwork.player:NotifyAll({"PlayerSetConfig", player:Name(), keyPrefix .. data.key, printValue})
+						end
+
+						netstream.Start(player, "SystemCfgValue", {data.key, configObject:Get()})
+					else
+						Clockwork.player:Notify(player, {"UnableToBeSet", data.key})
+					end
+				else
+					Clockwork.player:Notify(player, {"ConfigKeyIsStatic", data.key})
+				end
+			else
+				Clockwork.player:Notify(player, {"ConfigKeyIsNotValid", data.key})
+			end
+		end
+	end)
+
+	netstream.Hook("SystemCfgKeys", function(player, data)
+		local configKeys = {}
+
+		for k, v in pairs(Clockwork.config:GetStored()) do
+			if not v.isStatic then
+				configKeys[#configKeys + 1] = k
+			end
+		end
+
+		table.sort(configKeys, function(a, b) return a < b end)
+		netstream.Start(player, "SystemCfgKeys", configKeys)
+	end)
+
+	netstream.Hook("SystemCfgValue", function(player, data)
+		local configObject = Clockwork.config:Get(data)
+
+		if configObject:IsValid() then
+			if type(configObject:Get()) == "string" and configObject("isPrivate") then
+				netstream.Start(player, "SystemCfgValue", {data, "****"})
+			else
+				netstream.Start(player, "SystemCfgValue", {data, configObject:GetNext(configObject:Get())})
+			end
+		end
+	end)
+end

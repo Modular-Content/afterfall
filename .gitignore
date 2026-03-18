@@ -1,0 +1,9 @@
+# GitHub
+.secret/
+.git/
+.github/
+*.code-workspace
+
+# Production-related
+*.env*
+!*.example
