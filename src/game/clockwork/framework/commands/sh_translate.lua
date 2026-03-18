@@ -8,7 +8,7 @@ COMMAND.arguments = 3
 function COMMAND:OnRun(player, arguments)
 	if Clockwork.config:Get("translate_api_key"):Get() ~= "" then
 		http.Fetch("https://www.googleapis.com/language/translate/v2/languages?key=" .. Clockwork.config:Get("translate_api_key"):Get() .. "&target=en", function(body, length, headers, code)
-			body = Clockwork.json:Decode(body)
+			body = util.JSONToTable(body)
 
 			if body["data"] then
 				local languages = {}
@@ -30,7 +30,7 @@ function COMMAND:OnRun(player, arguments)
 				if source ~= "" then
 					if target ~= "" then
 						http.Fetch("https://www.googleapis.com/language/translate/v2?key=" .. Clockwork.config:Get("translate_api_key"):Get() .. "&source=" .. source .. "&target=" .. v .. "&q=" .. arguments[3], function(body, length, headers, code)
-							body = Clockwork.json:Decode(body)
+							body = util.JSONToTable(body)
 
 							if body["data"] then
 								Clockwork.chatBox:AddInRadius(player, "ic", body["data"]["translations"][1].translatedText, player:GetPos(), Clockwork.config:Get("talk_radius"):Get())

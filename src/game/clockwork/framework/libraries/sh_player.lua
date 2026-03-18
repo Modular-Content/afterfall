@@ -15,66 +15,71 @@ local table = table
 local ents = ents
 local math = math
 local util = util
+local jsonEncode = util.TableToJSON
+local jsonDecode = util.JSONToTable
 
-if not netstream then
-	include("sh_netstream.lua")
-end
+-- у клокворка настолько нищая система инклюда, что приходится так делать
+-- в честь этого я в инклюд добавлю order-загрузку, а то развели тут хуйню
 
-if not Clockwork.plugin then
-	include("sh_plugin.lua")
-end
+-- if not netstream then
+-- 	include("sh_netstream.lua")
+-- end
 
-if not Clockwork.config then
-	include("sh_config.lua")
-end
+-- if not Clockwork.plugin then
+-- 	include("sh_plugin.lua")
+-- end
 
-if not Clockwork.attribute then
-	include("sh_attribute.lua")
-end
+-- if not Clockwork.config then
+-- 	include("sh_config.lua")
+-- end
 
-if not Clockwork.faction then
-	include("sh_faction.lua")
-end
+-- if not Clockwork.attribute then
+-- 	include("sh_attribute.lua")
+-- end
 
-if not Clockwork.class then
-	include("sh_class.lua")
-end
+-- if not Clockwork.faction then
+-- 	include("sh_faction.lua")
+-- end
 
-if not Clockwork.trait then
-	include("sh_trait.lua")
-end
+-- if not Clockwork.class then
+-- 	include("sh_class.lua")
+-- end
 
-if not Clockwork.command then
-	include("sh_command.lua")
-end
+-- if not Clockwork.trait then
+-- 	include("sh_trait.lua")
+-- end
 
-if not Clockwork.attribute then
-	include("sh_attribute.lua")
-end
+-- if not Clockwork.command then
+-- 	include("sh_command.lua")
+-- end
 
-if not Clockwork.option then
-	include("sh_option.lua")
-end
+-- if not Clockwork.attribute then
+-- 	include("sh_attribute.lua")
+-- end
 
-if not Clockwork.entity then
-	include("sh_entity.lua")
-end
+-- if not Clockwork.option then
+-- 	include("sh_option.lua")
+-- end
 
-if not Clockwork.item then
-	include("sh_item.lua")
-end
+-- if not Clockwork.entity then
+-- 	include("sh_entity.lua")
+-- end
 
-if not Clockwork.json then
-	include("sh_json.lua")
-end
+-- if not Clockwork.item then
+-- 	include("sh_item.lua")
+-- end
 
-if not Clockwork.generator then
-	include("sh_generator.lua")
-end
+-- if not Clockwork.json then
+-- 	include("sh_json.lua")
+-- end
 
-if not Clockwork.inventory then
-	include("sh_inventory.lua")
-end
+-- if not Clockwork.generator then
+-- 	include("sh_generator.lua")
+-- end
+
+-- if not Clockwork.inventory then
+-- 	include("sh_inventory.lua")
+-- end
 
 local cwCfg = Clockwork.config
 local cwAttribute = Clockwork.attribute
@@ -88,7 +93,6 @@ local cwOption = Clockwork.option
 local cwPlugin = Clockwork.plugin
 local cwEntity = Clockwork.entity
 local cwItem = Clockwork.item
-local cwJson = Clockwork.json
 local cwGenerator = Clockwork.generator
 local cwInventory = Clockwork.inventory
 Clockwork.player = cwKernel:NewLibrary("Player")
@@ -865,18 +869,20 @@ if CLIENT then
 
 		return icon
 	end
+	-- у клокворка настолько нищая система инклюда, что приходится так делать
+	-- в честь этого я в инклюд добавлю order-загрузку, а то развели тут хуйню
 else -- if (SERVER) then
-	if not Clockwork.database then
-		include("server/sv_database.lua")
-	end
+	-- if not Clockwork.database then
+	-- 	include("server/sv_database.lua")
+	-- end
 
-	if not Clockwork.chatBox then
-		include("server/sv_chatbox.lua")
-	end
+	-- if not Clockwork.chatBox then
+	-- 	include("server/sv_chatbox.lua")
+	-- end
 
-	if not Clockwork.hint then
-		include("sv_hint.lua")
-	end
+	-- if not Clockwork.hint then
+	-- 	include("sv_hint.lua")
+	-- end
 
 	local cwHint = Clockwork.hint
 	local cwChatbox = Clockwork.chatBox
@@ -2516,7 +2522,7 @@ else -- if (SERVER) then
 	@returns {Unknown}
 --]]
 	function Clockwork.player:ConvertDataString(player, data)
-		local wasSuccess, value = xpcall(cwJson.Decode, debug.traceback, cwJson, data)
+		local wasSuccess, value = xpcall(jsonDecode, debug.traceback, data)
 
 		if wasSuccess and value ~= nil then
 			return value
@@ -4748,7 +4754,7 @@ else -- if (SERVER) then
 		end
 
 		if not rawTable then
-			return cwJson:Encode(ammo)
+			return jsonEncode(ammo)
 		else
 			return ammo
 		end
@@ -4767,7 +4773,7 @@ else -- if (SERVER) then
 		cwPlugin:Call("PlayerSaveCharacterData", player, data)
 
 		if not rawTable then
-			return cwJson:Encode(data)
+			return jsonEncode(data)
 		else
 			return data
 		end
@@ -4789,7 +4795,7 @@ else -- if (SERVER) then
 			end
 		end
 
-		return cwJson:Encode(recognisedNames)
+		return jsonEncode(recognisedNames)
 	end
 
 	--[[
@@ -4808,7 +4814,7 @@ else -- if (SERVER) then
 		end)
 
 		if not rawTable then
-			return cwJson:Encode(cwInventory:ToSaveable(inventory))
+			return jsonEncode(cwInventory:ToSaveable(inventory))
 		else
 			return inventory
 		end
@@ -4821,7 +4827,7 @@ else -- if (SERVER) then
 	@returns {Unknown}
 --]]
 	function Clockwork.player:ConvertCharacterRecognisedNamesString(data)
-		local wasSuccess, value = xpcall(cwJson.Decode, debug.traceback, cwJson, data)
+		local wasSuccess, value = xpcall(jsonDecode, debug.traceback, data)
 
 		if wasSuccess and value ~= nil then
 			local recognisedNames = {}
@@ -4843,7 +4849,7 @@ else -- if (SERVER) then
 	@returns {Unknown}
 --]]
 	function Clockwork.player:ConvertCharacterDataString(data)
-		local wasSuccess, value = xpcall(cwJson.Decode, debug.traceback, cwJson, data)
+		local wasSuccess, value = xpcall(jsonDecode, debug.traceback, data)
 
 		if wasSuccess and value ~= nil then
 			return value
@@ -4877,7 +4883,7 @@ else -- if (SERVER) then
 				player.cwLastPlayed = tonumber(result[1]._LastPlayed)
 				player.cwUserGroup = result[1]._UserGroup
 				player.cwData = self:ConvertDataString(player, result[1]._Data)
-				local wasSuccess, value = xpcall(cwJson.Decode, debug.traceback, cwJson, result[1]._Donations)
+				local wasSuccess, value = xpcall(jsonDecode, debug.traceback, result[1]._Donations)
 
 				if wasSuccess and value ~= nil then
 					player.cwDonations = value
@@ -4960,7 +4966,7 @@ else -- if (SERVER) then
 			queryObj:SetValue("_UserGroup", userGroup)
 			queryObj:SetValue("_SteamID", steamID)
 			queryObj:SetValue("_Schema", schemaFolder)
-			queryObj:SetValue("_Data", cwJson:Encode(data))
+			queryObj:SetValue("_Data", jsonEncode(data))
 			queryObj:Push()
 		else
 			local playersTable = cwCfg:Get("mysql_players_table"):Get()
@@ -5016,15 +5022,15 @@ else -- if (SERVER) then
 				local tableKey = "_" .. cwKernel:SetCamelCase(k, false)
 
 				if k == "recognisedNames" then
-					queryObj:SetValue(tableKey, cwJson:Encode(character.recognisedNames))
+					queryObj:SetValue(tableKey, jsonEncode(character.recognisedNames))
 				elseif k == "attributes" then
-					queryObj:SetValue(tableKey, cwJson:Encode(character.attributes))
+					queryObj:SetValue(tableKey, jsonEncode(character.attributes))
 				elseif k == "inventory" then
-					queryObj:SetValue(tableKey, cwJson:Encode(cwInventory:ToSaveable(character.inventory)))
+					queryObj:SetValue(tableKey, jsonEncode(cwInventory:ToSaveable(character.inventory)))
 				elseif k == "ammo" then
-					queryObj:SetValue(tableKey, cwJson:Encode(character.ammo))
+					queryObj:SetValue(tableKey, jsonEncode(character.ammo))
 				elseif k == "data" then
-					queryObj:SetValue(tableKey, cwJson:Encode(v))
+					queryObj:SetValue(tableKey, jsonEncode(v))
 				else
 					queryObj:SetValue(tableKey, v)
 				end
@@ -5062,7 +5068,7 @@ else -- if (SERVER) then
 			queryObj:AddWhere("_SteamID = ?", steamID)
 			queryObj:AddWhere("_CharacterID = ?", character.characterID)
 			queryObj:SetValue("_RecognisedNames", self:GetCharacterRecognisedNamesString(player, character))
-			queryObj:SetValue("_Attributes", cwJson:Encode(character.attributes))
+			queryObj:SetValue("_Attributes", jsonEncode(character.attributes))
 			queryObj:SetValue("_LastPlayed", unixTime)
 			queryObj:SetValue("_SteamName", player:SteamName())
 			queryObj:SetValue("_Faction", character.faction)
@@ -5078,9 +5084,9 @@ else -- if (SERVER) then
 				queryObj:SetValue("_Ammo", self:GetCharacterAmmoString(player, character))
 				queryObj:SetValue("_Data", self:GetCharacterDataString(player, character))
 			else
-				queryObj:SetValue("_Inventory", cwJson:Encode(cwInventory:ToSaveable(character.inventory)))
-				queryObj:SetValue("_Ammo", cwJson:Encode(character.ammo))
-				queryObj:SetValue("_Data", cwJson:Encode(character.data))
+				queryObj:SetValue("_Inventory", jsonEncode(cwInventory:ToSaveable(character.inventory)))
+				queryObj:SetValue("_Ammo", jsonEncode(character.ammo))
+				queryObj:SetValue("_Data", jsonEncode(character.data))
 			end
 
 			queryObj:Push()

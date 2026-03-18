@@ -9,10 +9,12 @@ local string = string
 local table = table
 local game = game
 
+-- у клокворка настолько нищая система инклюда, что приходится так делать
+-- в честь этого я в инклюд добавлю order-загрузку, а то развели тут хуйню
 --[[ We need the netstream library to add the hooks! --]]
-if not netstream then
-	include("sh_netstream.lua")
-end
+-- if not netstream then
+-- 	include("sh_netstream.lua")
+-- end
 
 Clockwork.config = Clockwork.kernel:NewLibrary("Config")
 Clockwork.config.indexes = Clockwork.config.indexes or {}

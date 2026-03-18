@@ -262,15 +262,12 @@ function Clockwork:PlayerThink(player, curTime, infoTable)
 	player:SetNetVar("InvSpace", math.ceil(infoTable.inventorySpace))
 	player:SetNetVar("Wages", math.ceil(infoTable.wages))
 
-	if cwEvent:CanRun("limb_damage", "disability") then
-		local leftLeg = cwLimb:GetDamage(player, HITGROUP_LEFTLEG, true)
-		local rightLeg = cwLimb:GetDamage(player, HITGROUP_RIGHTLEG, true)
-		local legDamage = math.max(leftLeg, rightLeg)
-
-		if legDamage > 0 then
-			infoTable.runSpeed = infoTable.runSpeed / (1 + legDamage)
-			infoTable.jumpPower = infoTable.jumpPower / (1 + legDamage)
-		end
+	local leftLeg = cwLimb:GetDamage(player, HITGROUP_LEFTLEG, true)
+	local rightLeg = cwLimb:GetDamage(player, HITGROUP_RIGHTLEG, true)
+	local legDamage = math.max(leftLeg, rightLeg)
+	if legDamage > 0 then
+		infoTable.runSpeed = infoTable.runSpeed / (1 + legDamage)
+		infoTable.jumpPower = infoTable.jumpPower / (1 + legDamage)
 	end
 
 	if player:KeyDown(IN_BACK) then
@@ -337,8 +334,12 @@ end
 	@returns {Unknown}
 --]]
 function Clockwork:PlayerShouldSmoothSprint(player, infoTable)
-	return true
+	return cwEvent:CanRun("smoothSprint", player, infoTable)
 end
+
+cwEvent:Hook('smoothSprint', function()
+	return cwConfig:Get("smooth_sprint_enabled"):Get()
+end)
 
 --[[
 	@codebase Server
@@ -518,14 +519,11 @@ function Clockwork:PlayerGetUnlockInfo(player, entity)
 	if cwEntity:IsDoor(entity) then
 		local unlockTime = cwConfig:Get("unlock_time"):Get()
 
-		if cwEvent:CanRun("limb_damage", "unlock_time") then
-			local leftArm = cwLimb:GetDamage(player, HITGROUP_LEFTARM, true)
-			local rightArm = cwLimb:GetDamage(player, HITGROUP_RIGHTARM, true)
-			local armDamage = math.max(leftArm, rightArm)
-
-			if armDamage > 0 then
-				unlockTime = unlockTime * (1 + armDamage)
-			end
+		local leftArm = cwLimb:GetDamage(player, HITGROUP_LEFTARM, true)
+		local rightArm = cwLimb:GetDamage(player, HITGROUP_RIGHTARM, true)
+		local armDamage = math.max(leftArm, rightArm)
+		if armDamage > 0 then
+			unlockTime = unlockTime * (1 + armDamage)
 		end
 
 		return {
@@ -564,14 +562,11 @@ function Clockwork:PlayerGetLockInfo(player, entity)
 	if cwEntity:IsDoor(entity) then
 		local lockTime = cwConfig:Get("lock_time"):Get()
 
-		if cwEvent:CanRun("limb_damage", "lock_time") then
-			local leftArm = cwLimb:GetDamage(player, HITGROUP_LEFTARM, true)
-			local rightArm = cwLimb:GetDamage(player, HITGROUP_RIGHTARM, true)
-			local armDamage = math.max(leftArm, rightArm)
-
-			if armDamage > 0 then
-				lockTime = lockTime * (1 + armDamage)
-			end
+		local leftArm = cwLimb:GetDamage(player, HITGROUP_LEFTARM, true)
+		local rightArm = cwLimb:GetDamage(player, HITGROUP_RIGHTARM, true)
+		local armDamage = math.max(leftArm, rightArm)
+		if armDamage > 0 then
+			lockTime = lockTime * (1 + armDamage)
 		end
 
 		return {
@@ -599,29 +594,23 @@ function Clockwork:PlayerCanFireWeapon(player, bIsRaised, weapon, bIsSecondary)
 	if not bIsRaised and not cwPlugin:Call("PlayerCanUseLoweredWeapon", player, weapon, bIsSecondary) then return false end
 	if canShootTime and canShootTime > curTime then return false end
 
-	if cwEvent:CanRun("limb_damage", "weapon_fire") then
-		local leftArm = cwLimb:GetDamage(player, HITGROUP_LEFTARM, true)
-		local rightArm = cwLimb:GetDamage(player, HITGROUP_RIGHTARM, true)
-		local armDamage = math.max(leftArm, rightArm)
-		if armDamage == 0 then return true end
-
-		if player.cwArmDamageNoFire then
-			if curTime >= player.cwArmDamageNoFire then
-				player.cwArmDamageNoFire = nil
-			end
-
-			return false
-		else
-			if not player.cwNextArmDamage then
-				player.cwNextArmDamage = curTime + (1 - armDamage * 0.5)
-			end
-
-			if curTime >= player.cwNextArmDamage then
-				player.cwNextArmDamage = nil
-
-				if math.random() <= armDamage * 0.75 then
-					player.cwArmDamageNoFire = curTime + (1 + armDamage * 2)
-				end
+	local leftArm = cwLimb:GetDamage(player, HITGROUP_LEFTARM, true)
+	local rightArm = cwLimb:GetDamage(player, HITGROUP_RIGHTARM, true)
+	local armDamage = math.max(leftArm, rightArm)
+	if armDamage == 0 then return true end
+	if player.cwArmDamageNoFire then
+		if curTime >= player.cwArmDamageNoFire then
+			player.cwArmDamageNoFire = nil
+		end
+		return false
+	else
+		if not player.cwNextArmDamage then
+			player.cwNextArmDamage = curTime + (1 - armDamage * 0.5)
+		end
+		if curTime >= player.cwNextArmDamage then
+			player.cwNextArmDamage = nil
+			if math.random() <= armDamage * 0.75 then
+				player.cwArmDamageNoFire = curTime + (1 + armDamage * 2)
 			end
 		end
 	end
@@ -982,6 +971,12 @@ function Clockwork:ClockworkConfigInitialized(key, value)
 		for k, v in pairs(cwItem:GetAll()) do
 			v.cost = 0
 		end
+	elseif key == "smooth_sprint_enabled" then
+		local players = player.GetAll()
+		for i = 1, #players do
+			local v = players[i]
+			if v:HasInitialized() then v.cwLastRunSpeed = nil end
+		end
 	elseif key == "local_voice" then
 		if value then
 			RunConsoleCommand("sv_alltalk", "0")
@@ -1118,9 +1113,8 @@ end
 function Clockwork:PlayerSpray(player)
 	if not player:Alive() or player:IsRagdolled() then
 		return true
-	elseif cwEvent:CanRun("config", "player_spray") then
-		return cwConfig:Get("disable_sprays"):Get()
 	end
+	return cwConfig:Get("disable_sprays"):Get()
 end
 
 --[[
@@ -4853,7 +4847,7 @@ end
 	@returns {Unknown}
 --]]
 function Clockwork:PlayerTakeDamage(player, inflictor, attacker, hitGroup, damageInfo)
-	if damageInfo:IsBulletDamage() and cwEvent:CanRun("limb_damage", "stumble") then
+	if damageInfo:IsBulletDamage() then
 		if hitGroup == HITGROUP_LEFTLEG or hitGroup == HITGROUP_RIGHTLEG then
 			local rightLeg = cwLimb:GetDamage(player, HITGROUP_RIGHTLEG)
 			local leftLeg = cwLimb:GetDamage(player, HITGROUP_LEFTLEG)

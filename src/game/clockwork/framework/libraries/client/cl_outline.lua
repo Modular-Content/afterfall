@@ -4,9 +4,9 @@ local Color = Color
 local math = math
 
 --[[ We need the plugin library to add this as a module! --]]
-if not Clockwork.plugin then
-	include("clockwork/framework/libraries/sh_plugin.lua")
-end
+-- if not Clockwork.plugin then
+-- 	include("clockwork/framework/libraries/sh_plugin.lua")
+-- end
 
 Clockwork.outline = Clockwork.kernel:NewLibrary("Outline")
 

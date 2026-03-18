@@ -17,10 +17,12 @@ local hook = hook
 local math = math
 local vgui = vgui
 
+-- у клокворка настолько нищая система инклюда, что приходится так делать
+-- в честь этого я в инклюд добавлю order-загрузку, а то развели тут хуйню
 --[[ We need the netstream library to add the hooks! --]]
-if not netstream then
-	include("clockwork/framework/libraries/sh_netstream.lua")
-end
+-- if not netstream then
+-- 	include("clockwork/framework/libraries/sh_netstream.lua")
+-- end
 
 Clockwork.chatBox = Clockwork.kernel:NewLibrary("ChatBox")
 Clockwork.chatBox.classes = Clockwork.chatBox.classes or {}

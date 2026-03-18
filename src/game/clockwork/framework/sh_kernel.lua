@@ -4647,6 +4647,56 @@ function Clockwork.kernel:IncludeDirectory(directory, bFromBase)
 	end
 end
 
+function mw.includeLibraries(directory, bFromBase, order)
+	if bFromBase then
+		directory = 'clockwork/framework/' .. directory
+	end
+	if string.utf8sub(directory, -1) ~= '/' then
+		directory = directory .. '/'
+	end
+	local ignore, loaded = {}, {}
+	for i = 1, #(order or {}) do
+		local v = order[i]
+		if string.sub(v, 1, 1) == '!' then ignore[string.sub(v, 2)] = true end
+	end
+	local function includeByName(name)
+		if ignore[name] then return end
+		if loaded[name] then return end
+		local prefix = string.sub(name, 1, 3)
+		local path
+		if prefix == 'sh_' then
+			path = directory .. name .. '.lua'
+		elseif prefix == 'sv_' then
+			path = directory .. 'server/' .. name .. '.lua'
+		elseif prefix == 'cl_' then
+			path = directory .. 'client/' .. name .. '.lua'
+		else
+			return
+		end
+		if file.Exists(path, 'LUA') then
+			Clockwork.kernel:IncludePrefixed(path)
+			loaded[name] = true
+		end
+	end
+	for i = 1, #(order or {}) do
+		local v = order[i]
+		if v ~= '*' and string.sub(v, 1, 1) ~= '!' then includeByName(v) end
+	end
+	if table.HasValue(order or {}, '*') then
+		local function includeFolder(path)
+			local files = file.Find(path .. '*.lua', 'LUA')
+			for i = 1, #files do
+				local v = files[i]
+				local cleanName = string.StripExtension(v)
+				if not ignore[cleanName] and not loaded[cleanName] then Clockwork.kernel:IncludePrefixed(path .. v) end
+			end
+		end
+		includeFolder(directory)
+		includeFolder(directory .. 'server/')
+		includeFolder(directory .. 'client/')
+	end
+end
+
 --[[
 	@codebase Shared
 	@details A function to include a prefixed cwFile.

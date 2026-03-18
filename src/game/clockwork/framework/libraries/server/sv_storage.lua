@@ -12,7 +12,6 @@ util.AddNetworkString("cwStorageSpace")
 util.AddNetworkString("cwStorageGive")
 util.AddNetworkString("cwStorageTake")
 
-
 -- small helpers --------------------------------------------------------------
 
 -- Send a net message to all players who are currently viewing the same
