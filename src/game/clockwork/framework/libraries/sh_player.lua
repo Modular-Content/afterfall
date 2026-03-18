@@ -2825,7 +2825,7 @@ else -- if (SERVER) then
 		end
 
 		if not info.noEavesdrop then
-			for k, v in pairs(cwPlayer.GetAll()) do
+			for k, v in ipairs(cwPlayer.GetAll()) do
 				if v:HasInitialized() and not listeners[v] then
 					if v:GetShootPos():Distance(player:GetShootPos()) <= cwCfg:Get("talk_radius"):Get() then
 						eavesdroppers[v] = v
@@ -3184,7 +3184,7 @@ else -- if (SERVER) then
 		netstream.Start(player, "ClearRecognisedNames", true)
 
 		if cwCfg:Get("save_recognised_names"):Get() then
-			for k, v in pairs(cwPlayer.GetAll()) do
+			for k, v in ipairs(cwPlayer.GetAll()) do
 				if v:HasInitialized() then
 					self:RestoreRecognisedName(player, v)
 					self:RestoreRecognisedName(v, player)
@@ -3279,7 +3279,7 @@ else -- if (SERVER) then
 				netstream.Start(player, "ClearRecognisedNames", true)
 			end
 		else
-			for k, v in pairs(cwPlayer.GetAll()) do
+			for k, v in ipairs(cwPlayer.GetAll()) do
 				if v:HasInitialized() then
 					if self:DoesRecognise(player, v, status, isAccurate) then
 						self:SetRecognises(player, v, false)
@@ -3300,7 +3300,7 @@ else -- if (SERVER) then
 	@returns {Unknown}
 --]]
 	function Clockwork.player:ClearName(player, status, isAccurate)
-		for k, v in pairs(cwPlayer.GetAll()) do
+		for k, v in ipairs(cwPlayer.GetAll()) do
 			if v:HasInitialized() then
 				if not status or self:DoesRecognise(v, player, status, isAccurate) then
 					self:SetRecognises(v, player, false)
@@ -3603,7 +3603,7 @@ else -- if (SERVER) then
 	@returns {Unknown}
 --]]
 	function Clockwork.player:CinematicTextAll(text, color, hangTime)
-		for k, v in pairs(cwPlayer.GetAll()) do
+		for k, v in ipairs(cwPlayer.GetAll()) do
 			if v:HasInitialized() then
 				self:CinematicText(v, text, color, hangTime)
 			end
@@ -3617,7 +3617,7 @@ else -- if (SERVER) then
 	@returns {Unknown}
 --]]
 	function Clockwork.player:FindByID(identifier)
-		for k, v in pairs(player.GetAll()) do
+		for k, v in ipairs(player.GetAll()) do
 			if v:HasInitialized() and (v:SteamID() == identifier or v:UniqueID() == identifier or string.find(string.lower(v:Name()), string.lower(identifier), 1, true)) then return v end
 		end
 	end
@@ -3669,7 +3669,7 @@ else -- if (SERVER) then
 	function Clockwork.player:NotifyInRadius(text, class, position, radius)
 		local listeners = {}
 
-		for k, v in pairs(cwPlayer.GetAll()) do
+		for k, v in ipairs(cwPlayer.GetAll()) do
 			if v:HasInitialized() then
 				if position:Distance(v:GetPos()) <= radius then
 					listeners[#listeners + 1] = v
@@ -3699,7 +3699,7 @@ else -- if (SERVER) then
 	@param {String} The name of the icon that will be used in the message, can be nil.
 --]]
 	function Clockwork.player:NotifyAdmins(adminLevel, text, icon)
-		for k, v in pairs(player.GetAll()) do
+		for k, v in ipairs(player.GetAll()) do
 			if adminLevel == "operator" or adminLevel == "o" then
 				if v:IsAdmin() then
 					self:Notify(v, text, true, icon)

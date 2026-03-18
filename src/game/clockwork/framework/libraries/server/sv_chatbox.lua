@@ -65,7 +65,7 @@ end
 function Clockwork.chatBox:AddInTargetRadius(speaker, class, text, position, radius, data)
 	local listeners = {}
 
-	for k, v in pairs(cwPlayer.GetAll()) do
+	for k, v in ipairs(cwPlayer.GetAll()) do
 		if v:HasInitialized() then
 			if Clockwork.player:GetRealTrace(v).HitPos:Distance(position) <= radius / 2 or position:Distance(v:GetPos()) <= radius then
 				listeners[#listeners + 1] = v
@@ -84,7 +84,7 @@ end
 function Clockwork.chatBox:AddInRadius(speaker, class, text, position, radius, data)
 	local listeners = {}
 
-	for k, v in pairs(cwPlayer.GetAll()) do
+	for k, v in ipairs(cwPlayer.GetAll()) do
 		if v:HasInitialized() then
 			if position:Distance(v:GetPos()) <= radius then
 				listeners[#listeners + 1] = v

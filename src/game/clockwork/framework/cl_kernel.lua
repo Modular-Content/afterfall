@@ -2251,7 +2251,7 @@ function Clockwork:HUDDrawTargetID()
 						if cwClient:GetShootPos():Distance(trace.HitPos) <= fadeDistance then
 							local active = nil
 
-							for k, v in pairs(_player.GetAll()) do
+							for k, v in ipairs(_player.GetAll()) do
 								if v:GetActiveWeapon() == trace.Entity then
 									active = true
 								end
@@ -2374,7 +2374,7 @@ end
     @param {Table} The current table of ESP positions/colors/names to add on to.
 --]]
 function Clockwork:GetAdminESPInfo(info)
-	for k, v in pairs(_player.GetAll()) do
+	for k, v in ipairs(_player.GetAll()) do
 		if v:HasInitialized() then
 			local physBone = v:LookupBone("ValveBiped.Bip01_Head1")
 			local position = nil
@@ -2410,7 +2410,7 @@ function Clockwork:GetAdminESPInfo(info)
 	end
 
 	if CW_CONVAR_SALEESP:GetInt() == 1 then
-		for k, v in pairs(ents.GetAll()) do
+		for k, v in ipairs(ents.GetAll()) do
 			if v:GetClass() == "cw_salesman" then
 				if v:IsValid() then
 					local position = v:GetPos() + Vector(0, 0, 80)
@@ -2436,7 +2436,7 @@ function Clockwork:GetAdminESPInfo(info)
 	end
 
 	if CW_CONVAR_ITEMESP:GetInt() == 1 then
-		for k, v in pairs(ents.GetAll()) do
+		for k, v in ipairs(ents.GetAll()) do
 			if v:GetClass() == "cw_item" then
 				if v:IsValid() then
 					local position = v:GetPos()
@@ -3738,7 +3738,7 @@ function Clockwork:HUDPaint()
 		self.BaseClass:HUDPaint()
 
 		if not cwKernel:IsScreenFadedBlack() then
-			for k, v in pairs(_player.GetAll()) do
+			for k, v in ipairs(_player.GetAll()) do
 				if v:HasInitialized() and v ~= cwClient then
 					cwPlugin:Call("HUDPaintPlayer", v)
 				end

@@ -18,7 +18,7 @@ util.AddNetworkString("cwStorageTake")
 -- Send a net message to all players who are currently viewing the same
 -- storage inventory table as `inventory`.
 local function SendToInventoryViewers(inventory, sendFunc)
-	for _, ply in pairs(cwPlayer.GetAll()) do
+	for _, ply in ipairs(cwPlayer.GetAll()) do
 		if ply:HasInitialized() and ply:GetStorageTable() then
 			if Clockwork.storage:Query(ply, "inventory") == inventory then
 				sendFunc(ply)
@@ -355,7 +355,7 @@ function Clockwork.storage:SyncCash(player)
 	local cash       = player:GetCash()
 
 	if Clockwork.config:Get("cash_enabled"):Get() then
-		for _, v in pairs(cwPlayer.GetAll()) do
+		for _, v in ipairs(cwPlayer.GetAll()) do
 			if v:HasInitialized() and self:Query(v, "inventory") == inventory then
 				recipients[#recipients + 1] = v
 				local storageTable = v:GetStorageTable()
@@ -388,7 +388,7 @@ function Clockwork.storage:SyncItem(player, itemTable)
 	definition.index = nil
 	local viewers = {}
 
-	for _, v in pairs(cwPlayer.GetAll()) do
+	for _, v in ipairs(cwPlayer.GetAll()) do
 		if v:HasInitialized() and self:Query(v, "inventory") == inventory then
 			viewers[#viewers + 1] = v
 		end
@@ -509,7 +509,7 @@ function Clockwork.storage:TakeFrom(player, itemTable)
 			storageTable.entity:TakeItem(itemTable)
 		end
 
-		for _, v in pairs(cwPlayer.GetAll()) do
+		for _, v in ipairs(cwPlayer.GetAll()) do
 			if v:HasInitialized() and self:Query(v, "inventory") == inventory then
 				viewers[#viewers + 1] = v
 			end

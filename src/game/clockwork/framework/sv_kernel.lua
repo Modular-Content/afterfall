@@ -1404,7 +1404,7 @@ function Clockwork:PlayerSpawn(player)
 			end
 
 			if STORED_RELATIONS and STORED_RELATIONS[uniqueID] then
-				for k, v in pairs(ents.GetAll()) do
+				for k, v in ipairs(ents.GetAll()) do
 					if v:IsNPC() then
 						local storedRelation = STORED_RELATIONS[uniqueID][v:GetClass()]
 
@@ -1585,7 +1585,7 @@ end
 function Clockwork:SaveData()
 	cwPlugin:Call("PreSaveData")
 
-	for _, v in pairs(player.GetAll()) do
+	for _, v in ipairs(player.GetAll()) do
 		if v:HasInitialized() then
 			v:SaveCharacter()
 		end
@@ -1618,7 +1618,7 @@ end
 	@returns {Unknown}
 --]]
 function Clockwork:InitPostEntity()
-	for k, v in pairs(ents.GetAll()) do
+	for k, v in ipairs(ents.GetAll()) do
 		if IsValid(v) then
 			if v:GetModel() then
 				cwEntity:SetMapEntity(v, true)
@@ -4680,7 +4680,7 @@ function Clockwork:ItemGetNetworkObservers(itemTable, info)
 		return false
 	end
 
-	for k, v in pairs(player.GetAll()) do
+	for k, v in ipairs(player.GetAll()) do
 		if v:HasInitialized() then
 			local inventory = cwStorage:Query(v, "inventory")
 
@@ -5240,7 +5240,7 @@ function Clockwork:PlayerSpawnedNPC(ply, npc)
 	STORED_RELATIONS = STORED_RELATIONS or {}
 	STORED_RELATIONS[uniqueID] = STORED_RELATIONS[uniqueID] or {}
 
-	for k, v in pairs(player.GetAll()) do
+	for k, v in ipairs(player.GetAll()) do
 		faction = cwFaction:FindByID(v:GetFaction())
 		if not faction then continue end
 		relation = faction.entRelationship

@@ -29,7 +29,7 @@ end
 -- Called when Clockwork config has changed.
 function cwPickupObjects:ClockworkConfigChanged(key, data, previousValue, newValue)
 	if key == "take_physcannon" then
-		for k, v in pairs(cwPlayer.GetAll()) do
+		for k, v in ipairs(cwPlayer.GetAll()) do
 			if newValue then
 				Clockwork.player:TakeSpawnWeapon(v, "weapon_physcannon")
 			else

@@ -154,7 +154,7 @@ function PANEL:Rebuild()
 	local owner = Clockwork.door:GetOwner()
 	local door = Clockwork.door:GetEntity()
 
-	for k, v in pairs(cwPlayer.GetAll()) do
+	for k, v in ipairs(cwPlayer.GetAll()) do
 		if v:HasInitialized() then
 			if Clockwork.Client ~= v and owner ~= v then
 				local access = accessList[v] or false

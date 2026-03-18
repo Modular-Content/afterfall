@@ -10,7 +10,7 @@ COMMAND.arguments = 1
 function COMMAND:OnRun(player, arguments)
 	local charName = string.lower(arguments[1])
 
-	for k, v in pairs(cwPlayer.GetAll()) do
+	for k, v in ipairs(cwPlayer.GetAll()) do
 		if v:HasInitialized() then
 			if string.lower(v:Name()) == charName then
 				Clockwork.player:NotifyAll({"PlayerUnbannedPlayer", player:Name(), arguments[1]})

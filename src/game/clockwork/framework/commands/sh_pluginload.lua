@@ -26,7 +26,7 @@ function COMMAND:OnRun(player, arguments)
 		if wasSuccess then
 			Clockwork.player:NotifyAll({"PlayerLoadedPlugin", player:Name(), plugin.name})
 
-			for k, v in pairs(cwPlayer.GetAll()) do
+			for k, v in ipairs(cwPlayer.GetAll()) do
 				if v:HasInitialized() then
 					if Clockwork.player:HasFlags(v, loadTable.access) or Clockwork.player:HasFlags(v, unloadTable.access) then
 						recipients[#recipients + 1] = v

@@ -9,7 +9,7 @@ COMMAND.arguments = 1
 function COMMAND:OnRun(player, arguments)
 	local listeners = {}
 
-	for k, v in pairs(cwPlayer.GetAll()) do
+	for k, v in ipairs(cwPlayer.GetAll()) do
 		if v:IsSuperAdmin() then
 			listeners[#listeners + 1] = v
 		end

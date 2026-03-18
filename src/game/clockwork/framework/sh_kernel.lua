@@ -4945,13 +4945,13 @@ end
 function Clockwork.kernel:GetPhysicsEntities()
 	local entities = {}
 
-	for k, v in pairs(ents.FindByClass("prop_physicsmultiplayer")) do
+	for k, v in ipairs(ents.FindByClass("prop_physicsmultiplayer")) do
 		if IsValid(v) then
 			entities[#entities + 1] = v
 		end
 	end
 
-	for k, v in pairs(ents.FindByClass("prop_physics")) do
+	for k, v in ipairs(ents.FindByClass("prop_physics")) do
 		if IsValid(v) then
 			entities[#entities + 1] = v
 		end

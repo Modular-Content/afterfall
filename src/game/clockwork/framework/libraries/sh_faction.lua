@@ -196,7 +196,7 @@ end
 function Clockwork.faction:GetPlayers(faction)
 	local players = {}
 
-	for k, v in pairs(cwPlayer.GetAll()) do
+	for k, v in ipairs(cwPlayer.GetAll()) do
 		if v:HasInitialized() then
 			if v:GetFaction() == faction then
 				players[#players + 1] = v

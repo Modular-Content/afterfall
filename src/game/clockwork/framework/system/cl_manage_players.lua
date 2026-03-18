@@ -16,7 +16,7 @@ function SYSTEM:OnDisplay(systemPanel, systemForm)
 	local availableClasses = {}
 	local classes = {}
 
-	for k, v in pairs(cwPlayer.GetAll()) do
+	for k, v in ipairs(cwPlayer.GetAll()) do
 		if v:HasInitialized() then
 			local class = Clockwork.plugin:Call("GetPlayerScoreboardClass", v)
 
