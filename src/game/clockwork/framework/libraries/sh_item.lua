@@ -68,9 +68,17 @@ function CLASS_TABLE:__call(varName, failSafe)
 	return self[varName] ~= nil and self[varName] or failSafe
 end
 
+mwinv = mwinv or {}
+-- мне так удобнее
+function mwinv.getItemData(item, field, default)
+	if not item then return default end
+	if getmetatable(item) ~= CLASS_TABLE then return default end
+	return item(field, default)
+end
+
 -- Called when the item is converted to a string.
 function CLASS_TABLE:__tostring()
-	return "ITEM[" .. self("itemID") .. "]"
+	return "ITEM [" .. self("itemID") .. "][" .. mwinv.getItemData(self, "uniqueID", "unknown_item") .. "]"
 end
 
 --[[
