@@ -1003,6 +1003,16 @@ function ClockworkLite:OnPauseMenuShow()
 	end
 end
 
+-- пожалуйста рубат сделай вызов хука для консоли тоже а то это полный qwq
+local wV = false
+hook.Add('Think', 'ClockworkLite.console', function()
+	local iV = gui.IsConsoleVisible()
+	if iV and not wV then
+		hook.Run('OnPauseMenuShow')
+	end
+	wV = iV
+end)
+
 --[[
 	@codebase Client
 	@details Called when a player presses a bind at the top level.
