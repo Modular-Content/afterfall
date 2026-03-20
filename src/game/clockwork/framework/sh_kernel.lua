@@ -4643,7 +4643,8 @@ function Clockwork.kernel:IncludeDirectory(directory, bFromBase)
 	end
 end
 
-function mw.includeLibraries(directory, bFromBase, order)
+mw.include = mw.include or {}
+function mw.include.files(directory, bFromBase, order)
 	if bFromBase then
 		directory = 'clockwork/framework/' .. directory
 	end

@@ -28,6 +28,7 @@ function cwSaveItems:SaveShipments()
 	for k, v in ipairs(ents.FindByClass("cw_shipment")) do
 		local physicsObject = v:GetPhysicsObject()
 		local itemTable = v:GetItemTable()
+		if not itemTable then continue end
 		local bMoveable = nil
 
 		if IsValid(physicsObject) then

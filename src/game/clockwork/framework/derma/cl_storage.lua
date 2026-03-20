@@ -413,105 +413,207 @@ vgui.Register("cwStorageSpace", PANEL, "DPanel")
 /*                            NETWORKING FUNCTIONS                            */
 /* -------------------------------------------------------------------------- */
 
-net.Receive(
-    "cwStorageStart",
-    function()
-        gui.EnableScreenClicker(true)
-        Clockwork.storage.noCashWeight = net.ReadBool()
-        Clockwork.storage.noCashSpace = net.ReadBool()
-        Clockwork.storage.isOneSided = net.ReadBool()
-        Clockwork.storage.entity = net.ReadEntity()
-        Clockwork.storage.name = net.ReadString()
-        Clockwork.storage.inventory = {}
-        Clockwork.storage.weight = Clockwork.config:Get("default_inv_weight"):Get()
-        Clockwork.storage.space = Clockwork.config:Get("default_inv_space"):Get()
-        Clockwork.storage.cash = 0
+-- net.Receive(
+--     "cwStorageStart",
+--     function()
+--         gui.EnableScreenClicker(true)
+--         Clockwork.storage.noCashWeight = net.ReadBool()
+--         Clockwork.storage.noCashSpace = net.ReadBool()
+--         Clockwork.storage.isOneSided = net.ReadBool()
+--         Clockwork.storage.entity = net.ReadEntity()
+--         Clockwork.storage.name = net.ReadString()
+--         Clockwork.storage.inventory = {}
+--         Clockwork.storage.weight = Clockwork.config:Get("default_inv_weight"):Get()
+--         Clockwork.storage.space = Clockwork.config:Get("default_inv_space"):Get()
+--         Clockwork.storage.cash = 0
 
-        Clockwork.storage.panel = vgui.Create("cwStorage")
-        Clockwork.storage.panel:Rebuild()
-        Clockwork.storage.panel:MakePopup()
-        Clockwork.kernel:RegisterBackgroundBlur(Clockwork.storage:GetPanel(), SysTime())
-    end
+--         Clockwork.storage.panel = vgui.Create("cwStorage")
+--         Clockwork.storage.panel:Rebuild()
+--         Clockwork.storage.panel:MakePopup()
+--         Clockwork.kernel:RegisterBackgroundBlur(Clockwork.storage:GetPanel(), SysTime())
+--     end
+-- )
+
+netstream.Hook(
+	"cwStorageStart",
+	function(data)
+		gui.EnableScreenClicker(true)
+		Clockwork.storage.noCashWeight = data.noCashWeight
+		Clockwork.storage.noCashSpace = data.noCashSpace
+		Clockwork.storage.isOneSided = data.isOneSided
+		Clockwork.storage.entity = data.entity
+		Clockwork.storage.name = data.name
+		Clockwork.storage.inventory = {}
+		Clockwork.storage.weight = Clockwork.config:Get("default_inv_weight"):Get()
+		Clockwork.storage.space = Clockwork.config:Get("default_inv_space"):Get()
+		Clockwork.storage.cash = 0
+
+		Clockwork.storage.panel = vgui.Create("cwStorage")
+		Clockwork.storage.panel:Rebuild()
+		Clockwork.storage.panel:MakePopup()
+		Clockwork.kernel:RegisterBackgroundBlur(Clockwork.storage:GetPanel(), SysTime())
+	end
 )
 
-net.Receive(
-    "cwStorageCash",
-    function()
-        if Clockwork.storage:IsStorageOpen() then
-            Clockwork.storage.cash = net.ReadInt(32)
-            Clockwork.storage:GetPanel():Rebuild()
-        end
-    end
+-- net.Receive(
+--     "cwStorageCash",
+--     function()
+--         if Clockwork.storage:IsStorageOpen() then
+--             Clockwork.storage.cash = net.ReadInt(32)
+--             Clockwork.storage:GetPanel():Rebuild()
+--         end
+--     end
+-- )
+
+netstream.Hook(
+	"cwStorageCash",
+	function(cash)
+		if Clockwork.storage:IsStorageOpen() then
+			Clockwork.storage.cash = cash
+			Clockwork.storage:GetPanel():Rebuild()
+		end
+	end
 )
 
-net.Receive(
-    "cwStorageWeight",
-    function()
-        if Clockwork.storage:IsStorageOpen() then
-            Clockwork.storage.weight = net.ReadInt(32)
-            Clockwork.storage:GetPanel():Rebuild()
-        end
-    end
+-- net.Receive(
+--     "cwStorageWeight",
+--     function()
+--         if Clockwork.storage:IsStorageOpen() then
+--             Clockwork.storage.weight = net.ReadInt(32)
+--             Clockwork.storage:GetPanel():Rebuild()
+--         end
+--     end
+-- )
+
+netstream.Hook(
+	"cwStorageWeight",
+	function(weight)
+		if Clockwork.storage:IsStorageOpen() then
+			Clockwork.storage.weight = weight
+			Clockwork.storage:GetPanel():Rebuild()
+		end
+	end
 )
 
-net.Receive(
-    "cwStorageSpace",
-    function()
-        if Clockwork.storage:IsStorageOpen() then
-            Clockwork.storage.space = net.ReadInt(32)
-            Clockwork.storage:GetPanel():Rebuild()
-        end
-    end
+-- net.Receive(
+--     "cwStorageSpace",
+--     function()
+--         if Clockwork.storage:IsStorageOpen() then
+--             Clockwork.storage.space = net.ReadInt(32)
+--             Clockwork.storage:GetPanel():Rebuild()
+--         end
+--     end
+-- )
+
+netstream.Hook(
+	"cwStorageSpace",
+	function(space)
+		if Clockwork.storage:IsStorageOpen() then
+			Clockwork.storage.space = space
+			Clockwork.storage:GetPanel():Rebuild()
+		end
+	end
 )
 
-net.Receive(
-    "cwStorageClose",
-    function()
-        if Clockwork.storage:IsStorageOpen() then
-            Clockwork.kernel:RemoveBackgroundBlur(Clockwork.storage:GetPanel())
-            CloseDermaMenus()
-            Clockwork.storage:GetPanel():Close()
-            Clockwork.storage:GetPanel():Remove()
-            gui.EnableScreenClicker(false)
-            Clockwork.storage.inventory = nil
-            Clockwork.storage.weight = nil
-            Clockwork.storage.space = nil
-            Clockwork.storage.entity = nil
-            Clockwork.storage.name = nil
-        end
-    end
+-- net.Receive(
+--     "cwStorageClose",
+--     function()
+--         if Clockwork.storage:IsStorageOpen() then
+--             Clockwork.kernel:RemoveBackgroundBlur(Clockwork.storage:GetPanel())
+--             CloseDermaMenus()
+--             Clockwork.storage:GetPanel():Close()
+--             Clockwork.storage:GetPanel():Remove()
+--             gui.EnableScreenClicker(false)
+--             Clockwork.storage.inventory = nil
+--             Clockwork.storage.weight = nil
+--             Clockwork.storage.space = nil
+--             Clockwork.storage.entity = nil
+--             Clockwork.storage.name = nil
+--         end
+--     end
+-- )
+
+netstream.Hook(
+	"cwStorageClose",
+	function(data)
+		if Clockwork.storage:IsStorageOpen() then
+			Clockwork.kernel:RemoveBackgroundBlur(Clockwork.storage:GetPanel())
+			CloseDermaMenus()
+			Clockwork.storage:GetPanel():Close()
+			Clockwork.storage:GetPanel():Remove()
+			gui.EnableScreenClicker(false)
+			Clockwork.storage.inventory = nil
+			Clockwork.storage.weight = nil
+			Clockwork.storage.space = nil
+			Clockwork.storage.entity = nil
+			Clockwork.storage.name = nil
+		end
+	end
 )
 
-net.Receive(
-    "cwStorageTake",
-    function()
-        if Clockwork.storage:IsStorageOpen() then
-            local sig = net.ReadTable()
-            Clockwork.inventory:RemoveUniqueID(Clockwork.storage.inventory, sig.uniqueID, sig.itemID)
-            Clockwork.storage:GetPanel():Rebuild()
-        end
-    end
+-- net.Receive(
+--     "cwStorageTake",
+--     function()
+--         if Clockwork.storage:IsStorageOpen() then
+--             local sig = net.ReadTable()
+--             Clockwork.inventory:RemoveUniqueID(Clockwork.storage.inventory, sig.uniqueID, sig.itemID)
+--             Clockwork.storage:GetPanel():Rebuild()
+--         end
+--     end
+-- )
+
+netstream.Hook(
+	"cwStorageTake",
+	function(sig)
+		if Clockwork.storage:IsStorageOpen() then
+			Clockwork.inventory:RemoveUniqueID(Clockwork.storage.inventory, sig.uniqueID, sig.itemID)
+			Clockwork.storage:GetPanel():Rebuild()
+		end
+	end
 )
 
-net.Receive(
-    "cwStorageGive",
-    function()
-        if Clockwork.storage:IsStorageOpen() then
-            local uniqueID = net.ReadString()
-            local count = net.ReadUInt(12)
-            local itemTable = Clockwork.item:FindByID(uniqueID)
+-- net.Receive(
+--     "cwStorageGive",
+--     function()
+--         if Clockwork.storage:IsStorageOpen() then
+--             local uniqueID = net.ReadString()
+--             local count = net.ReadUInt(12)
+--             local itemTable = Clockwork.item:FindByID(uniqueID)
 
-            if itemTable then
-                for i = 1, count do
-                    local id = net.ReadUInt(32)
-                    local data = net.ReadTable()
-                    Clockwork.inventory:AddInstance(
-                        Clockwork.storage.inventory,
-                        Clockwork.item:CreateInstance(uniqueID, id, data)
-                    )
-                end
-                Clockwork.storage:GetPanel():Rebuild()
-            end
-        end
-    end
+--             if itemTable then
+--                 for i = 1, count do
+--                     local id = net.ReadUInt(32)
+--                     local data = net.ReadTable()
+--                     Clockwork.inventory:AddInstance(
+--                         Clockwork.storage.inventory,
+--                         Clockwork.item:CreateInstance(uniqueID, id, data)
+--                     )
+--                 end
+--                 Clockwork.storage:GetPanel():Rebuild()
+--             end
+--         end
+--     end
+-- )
+
+netstream.Hook(
+	"cwStorageGive",
+	function(data)
+		if Clockwork.storage:IsStorageOpen() then
+			local uniqueID = data.uniqueID
+			local count = data.count
+			local itemTable = Clockwork.item:FindByID(uniqueID)
+
+			if itemTable then
+				for i = 1, count do
+					local id = data.entry.id
+					local itemData = data.entry.data
+					Clockwork.inventory:AddInstance(
+						Clockwork.storage.inventory,
+						Clockwork.item:CreateInstance(uniqueID, id, itemData)
+					)
+				end
+				Clockwork.storage:GetPanel():Rebuild()
+			end
+		end
+	end
 )

@@ -47,7 +47,7 @@ team.SetUp(1, 'Default', Color(0, 255, 255))
 -- Clockwork.kernel:IncludeDirectory("libraries/server", true)
 -- Clockwork.kernel:IncludeDirectory("libraries/client", true)
 -- Clockwork.kernel:IncludeDirectory("libraries/", true)
-mw.includeLibraries("libraries/", true, {
+mw.include.files("libraries/", true, {
 	'!sh_json', -- оставлю его на память как самый позорный файл в истории клокворка
 	'sv_file',
 	'sh_netstream',
