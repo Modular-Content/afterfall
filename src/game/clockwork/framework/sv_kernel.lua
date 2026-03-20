@@ -248,6 +248,7 @@ function Clockwork:PlayerThink(player, curTime, infoTable)
 		cwPly:ToggleWeaponRaised(player)
 		player.cwReloadHoldTime = nil
 		player.cwNextShootTime = curTime + cwConfig:Get("shoot_after_raise_time"):Get()
+		player:SetNetVar('NextShootTime', player.cwNextShootTime)
 	end
 
 	if player:IsRagdolled() then
