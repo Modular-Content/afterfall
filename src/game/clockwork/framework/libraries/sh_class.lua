@@ -164,6 +164,9 @@ function Clockwork.class:GetAppropriateModel(name, player, noSubstitute)
 		skin = 1
 	end
 
+	local nvSkin = player:GetCharacterData("Skin", 0)
+	if nvSkin > 0 then skin = nvSkin end
+
 	return model, skin
 end
 

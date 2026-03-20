@@ -64,6 +64,18 @@ function PANEL:Init()
 		end)
 
 		self.loadButton:SetMouseInputEnabled(true)
+
+		self.aboutButton = vgui.Create("cwLabelButton", self)
+		self.aboutButton:SetFont(smallTextFont)
+		self.aboutButton:SetAlpha(0)
+		self.aboutButton:FadeIn(1)
+		
+		self.aboutButton:SetCallback(function(panel)
+			gui.OpenURL('https://modularcontent.dev/modularwork/')
+		end)
+
+		self.aboutButton:SetMouseInputEnabled(true)
+
 		self.disconnectButton = vgui.Create("cwLabelButton", self)
 		self.disconnectButton:SetFont(smallTextFont)
 		self.disconnectButton:FadeIn(0.5)
@@ -119,13 +131,12 @@ function PANEL:Init()
 
 		self.cancelButton:SetMouseInputEnabled(true)
 
-		local modelSize = math.min(ScrW() * 0.5, ScrH() * 0.75)
+		local modelSize = ScrH() * 0.7
 
 		self.characterModel = vgui.Create("cwCharacterModel", self)
-		self.characterModel:SetAlpha(0)
+		-- self.characterModel:SetAlpha(0)
 		self.characterModel:SetSize(modelSize, modelSize) -- TBD: Remove this for new cam pos
-
-		self.characterModel:SetModel("models/error.mdl")
+		-- self.characterModel:SetModel("models/error.mdl")
 		self.createTime = SysTime()
 		Clockwork.theme:Call("PostCharacterMenuInit", self)
 		self:ResetTextAndPositions()
@@ -141,8 +152,8 @@ function PANEL:ResetTextAndPositions()
 	local scrH = ScrH()
 	local scrW = ScrW()
 
-	self.titleLabel:SetText(string.upper(Schema:GetName()))
-	self.subLabel:SetText(L(string.upper(Schema:GetDescription())))
+	self.titleLabel:SetText('')
+	self.subLabel:SetText(string.upper(L("CharacterMenuSubTitle")))
 	self.subLabel:SizeToContents()
 
 	local schemaLogo = Clockwork.option:GetKey("schema_logo")
@@ -150,60 +161,56 @@ function PANEL:ResetTextAndPositions()
 	if schemaLogo == "" then
 		self.titleLabel:SetVisible(true)
 		self.titleLabel:SizeToContents()
-		self.titleLabel:SetPos(scrW / 2 - self.titleLabel:GetWide() / 2, scrH * 0.4)
+		self.titleLabel:SetPos(scrW / 2 - self.titleLabel:GetWide() / 2, scrH * 0.3)
 		self.subLabel:SetPos(scrW / 2 - self.subLabel:GetWide() / 2, self.titleLabel.y + self.titleLabel:GetTall() + 8)
 	else
 		self.titleLabel:SetVisible(false)
 		self.titleLabel:SetSize(512, 256)
-		self.titleLabel:SetPos(scrW / 2 - self.titleLabel:GetWide() / 2, scrH * 0.4 - 128)
+		self.titleLabel:SetPos(scrW / 2 - self.titleLabel:GetWide() / 2, scrH * 0.3 - 128)
 		self.subLabel:SetPos(self.titleLabel.x + self.titleLabel:GetWide() / 2 - self.subLabel:GetWide() / 2, self.titleLabel.y + self.titleLabel:GetTall() + 8)
 	end
 
-	self.authorLabel:SetText(L("DevelopedBy", string.upper(Schema:GetAuthor())))
+	self.authorLabel:SetText(L("CharacterMenuAuthorLabel"))
 	self.authorLabel:SizeToContents()
 	self.authorLabel:SetPos(self.subLabel.x + (self.subLabel:GetWide() - self.authorLabel:GetWide()), self.subLabel.y + self.subLabel:GetTall() + 4)
 
 	self.createButton:SetText(L("CharacterMenuNew"))
 	self.createButton:SizeToContents()
-	self.createButton:SetPos(scrW * 0.25, 16)
+	self.createButton:SetPos((ScrW() / 2) - (self.createButton:GetWide() / 2) , ScrH() * 0.6)
 
 	self.loadButton:SetText(L("CharacterMenuLoad"))
 	self.loadButton:SizeToContents()
-	self.loadButton:SetPos(scrW * 0.75, 16)
+	self.loadButton:SetPos((ScrW() / 2) - (self.loadButton:GetWide() / 2), ScrH() * 0.65)
+
+	self.aboutButton:SetText(L("CharacterMenuAbout"))
+	self.aboutButton:SizeToContents()
+	self.aboutButton:SetPos((ScrW() / 2) - (self.aboutButton:GetWide()) / 2, ScrH() * 0.7)
 
 	self.disconnectButton:SetText(L("CharacterMenuLeave"))
 	self.disconnectButton:SizeToContents()
-	self.disconnectButton:SetPos(scrW / 2 - self.disconnectButton:GetWide() / 2, 16)
+	self.disconnectButton:SetPos((ScrW() / 2) - (self.disconnectButton:GetWide() / 2), ScrH() * 0.75)
 
 	self.previousButton:SetText(L("CharacterMenuPrevious"))
 	self.previousButton:SizeToContents()
-	self.previousButton:SetPos(scrW * 0.2 - self.previousButton:GetWide() / 2, scrH * 0.9)
+	self.previousButton:SetPos((scrW * 0.2) - (self.previousButton:GetWide() / 2), scrH * 0.9)
 
 	self.nextButton:SetText(L("CharacterMenuNext"))
 	self.nextButton:SizeToContents()
-	self.nextButton:SetPos(scrW * 0.8 - self.nextButton:GetWide() / 2, scrH * 0.9)
+	self.nextButton:SetPos((scrW * 0.8) - (self.nextButton:GetWide() / 2), scrH * 0.9)
 
 	self.cancelButton:SetText(L("CharacterMenuCancel"))
 	self.cancelButton:SizeToContents()
-	self.cancelButton:SetPos(scrW * 0.5 - self.cancelButton:GetWide() / 2, scrH * 0.9)
+	self.cancelButton:SetPos((scrW * 0.5) - (self.cancelButton:GetWide() / 2), scrH * 0.9)
 end
 
 -- A function to fade in the model panel.
 function PANEL:FadeInModelPanel(model)
 	if ScrH() < 768 then return true end
-	local panel = Clockwork.character:GetActivePanel()
-	local x, y = ScrW() - self.characterModel:GetWide() - 8, 16
-
-	if panel then
-		x = panel.x + panel:GetWide() - 16
-		y = (panel.y + panel:GetTall() / 2) - self.characterModel:GetTall() / 2
-	end
-
+	local width, height = self.characterModel:GetSize()
+	local x, y = ScrW() - width - ScrW() * 0.1, (ScrH() - height) * 0.4
 	self.characterModel:SetPos(x, y)
-
 	if self.characterModel:FadeIn(0.5) then
 		self:SetModelPanelModel(model)
-
 		return true
 	else
 		return false
@@ -223,18 +230,13 @@ function PANEL:SetModelPanelModel(model)
 	end
 
 	local modelPanel = self.characterModel
-	local weaponModel = Clockwork.plugin:Call("GetModelSelectWeaponModel", model)
 	local sequence = Clockwork.plugin:Call("GetModelSelectSequence", modelPanel.Entity, model)
-
-	if weaponModel then
-		self.characterModel:SetWeaponModel(weaponModel)
-	else
-		self.characterModel:SetWeaponModel(false)
-	end
 
 	if sequence then
 		modelPanel.Entity:ResetSequence(sequence)
 	end
+
+	if IsValid(self.characterModel.skinComboBox) then self.characterModel.skinComboBox:Remove() end
 end
 
 -- A function to return to the main menu.
@@ -242,17 +244,11 @@ function PANEL:ReturnToMainMenu()
 	local panel = Clockwork.character:GetActivePanel()
 
 	if panel then
-		if CW_CONVAR_FADEPANEL:GetInt() == 1 then
-			panel:FadeOut(0.5, function()
-				Clockwork.character.activePanel = nil
-				panel:Remove()
-				self:FadeInTitle()
-			end)
-		else
+		panel:FadeOut(0.5, function()
 			Clockwork.character.activePanel = nil
 			panel:Remove()
 			self:FadeInTitle()
-		end
+		end)
 	else
 		self:FadeInTitle()
 	end
@@ -284,6 +280,10 @@ function PANEL:FadeOutTitle()
 	if not Clockwork.theme:Call("PreCharacterFadeOutTitle", self) then
 		self.subLabel:FadeOut(0.5)
 		self.titleLabel:FadeOut(0.5)
+		self.createButton:FadeOut(0.5)
+		self.loadButton:FadeOut(0.5)
+		self.aboutButton:FadeOut(0.5)
+		self.disconnectButton:FadeOut(0.5)
 		self.authorLabel:FadeOut(0.5)
 	end
 end
@@ -292,6 +292,10 @@ end
 function PANEL:FadeInTitle()
 	if not Clockwork.theme:Call("PreCharacterFadeInTitle", self) then
 		self.subLabel:FadeIn(0.5)
+		self.createButton:FadeIn(0.5)
+		self.loadButton:FadeIn(0.5)
+		self.aboutButton:FadeIn(0.5)
+		self.disconnectButton:FadeIn(0.5)
 		self.titleLabel:FadeIn(0.5)
 		self.authorLabel:FadeIn(0.5)
 	end
@@ -301,10 +305,10 @@ end
 function PANEL:OpenPanel(vguiName, childData, Callback)
 	if not Clockwork.theme:Call("PreCharacterMenuOpenPanel", self, vguiName, childData, Callback) then
 		local panel = Clockwork.character:GetActivePanel()
-		local y = ScrH() * 0.2
+		local y = ScrH() * .275
 
 		if ScrH() < 768 then
-			y = ScrH() * 0.11
+			y = ScrH() * .225
 		end
 
 		if panel then
@@ -368,53 +372,53 @@ function PANEL:Paint(w, h)
 			surface.DrawTexturedRect(self.titleLabel.x, self.titleLabel.y - 64, 512, 256)
 		end
 
-		local backgroundColor = Clockwork.option:GetColor("background")
-		local foregroundColor = Clockwork.option:GetColor("foreground")
-		local colorTargetID = Clockwork.option:GetColor("target_id")
-		local colorWhite = Clockwork.option:GetColor("white")
-		local scrW = ScrW()
-		local height = self.createButton.y * 2 + self.createButton:GetTall()
-		local y = 0
+		-- local backgroundColor = Clockwork.option:GetColor("background")
+		-- local foregroundColor = Clockwork.option:GetColor("foreground")
+		-- local colorTargetID = Clockwork.option:GetColor("target_id")
+		-- local colorWhite = Clockwork.option:GetColor("white")
+		-- local scrW = ScrW()
+		-- local height = self.createButton.y * 2 + self.createButton:GetTall()
+		-- local y = 0
 
-		Clockwork.kernel:DrawSimpleGradientBox(0, 0, y, scrW, height, Color(backgroundColor.r, backgroundColor.g, backgroundColor.b, 100))
+		-- Clockwork.kernel:DrawSimpleGradientBox(0, 0, y, scrW, height, Color(backgroundColor.r, backgroundColor.g, backgroundColor.b, 100))
 
-		surface.SetDrawColor(foregroundColor.r, foregroundColor.g, foregroundColor.b, 200)
-		surface.DrawRect(0, y + height, scrW, 1)
+		-- surface.SetDrawColor(foregroundColor.r, foregroundColor.g, foregroundColor.b, 200)
+		-- surface.DrawRect(0, y + height, scrW, 1)
 
-		if Clockwork.character:IsCreationProcessActive() then
-			local creationPanels = Clockwork.character:GetCreationPanels(true)
-			local numCreationPanels = #creationPanels
-			local creationProgress = Clockwork.character:GetCreationProgress()
-			local mainTextFont = Clockwork.option:GetFont("main_text")
-			local _, mainTextH = Clockwork.kernel:GetCachedTextSize(mainTextFont, "U")
-			local progressHeight = mainTextH + 16
-			local progressY = y + height + 1
-			local boxColor = Color(math.min(backgroundColor.r + 50, 255), math.min(backgroundColor.g + 50, 255), math.min(backgroundColor.b + 50, 255), 100)
+		-- if Clockwork.character:IsCreationProcessActive() then
+		-- 	local creationPanels = Clockwork.character:GetCreationPanels(true)
+		-- 	local numCreationPanels = #creationPanels
+		-- 	local creationProgress = Clockwork.character:GetCreationProgress()
+		-- 	local mainTextFont = Clockwork.option:GetFont("main_text")
+		-- 	local _, mainTextH = Clockwork.kernel:GetCachedTextSize(mainTextFont, "U")
+		-- 	local progressHeight = mainTextH + 16
+		-- 	local progressY = y + height + 1
+		-- 	local boxColor = Color(math.min(backgroundColor.r + 50, 255), math.min(backgroundColor.g + 50, 255), math.min(backgroundColor.b + 50, 255), 100)
 
-			Clockwork.kernel:DrawSimpleGradientBox(0, 0, progressY, scrW, progressHeight, boxColor)
+		-- 	Clockwork.kernel:DrawSimpleGradientBox(0, 0, progressY, scrW, progressHeight, boxColor)
 
-			for i = 1, numCreationPanels do
-				surface.SetDrawColor(foregroundColor.r, foregroundColor.g, foregroundColor.b, 150)
-				surface.DrawRect((scrW / numCreationPanels) * i, progressY, 1, progressHeight)
-			end
+		-- 	for i = 1, numCreationPanels do
+		-- 		surface.SetDrawColor(foregroundColor.r, foregroundColor.g, foregroundColor.b, 150)
+		-- 		surface.DrawRect((scrW / numCreationPanels) * i, progressY, 1, progressHeight)
+		-- 	end
 
-			Clockwork.kernel:DrawSimpleGradientBox(0, 0, progressY, (scrW / 100) * creationProgress, progressHeight, colorTargetID)
+		-- 	Clockwork.kernel:DrawSimpleGradientBox(0, 0, progressY, (scrW / 100) * creationProgress, progressHeight, colorTargetID)
 
-			if creationProgress > 0 and creationProgress < 100 then
-				surface.SetDrawColor(foregroundColor.r, foregroundColor.g, foregroundColor.b, 200)
-				surface.DrawRect((scrW / 100) * creationProgress, progressY, 1, progressHeight)
-			end
+		-- 	if creationProgress > 0 and creationProgress < 100 then
+		-- 		surface.SetDrawColor(foregroundColor.r, foregroundColor.g, foregroundColor.b, 200)
+		-- 		surface.DrawRect((scrW / 100) * creationProgress, progressY, 1, progressHeight)
+		-- 	end
 
-			for i = 1, numCreationPanels do
-				local textX = (scrW / numCreationPanels) * (i - 0.5)
-				local textY = progressY + progressHeight / 2
-				local color = Color(colorWhite.r, colorWhite.g, colorWhite.b, 200)
-				Clockwork.kernel:DrawSimpleText(L(creationPanels[i].friendlyName), textX, textY - 1, color, 1, 1)
-			end
+		-- 	for i = 1, numCreationPanels do
+		-- 		local textX = (scrW / numCreationPanels) * (i - 0.5)
+		-- 		local textY = progressY + progressHeight / 2
+		-- 		local color = Color(colorWhite.r, colorWhite.g, colorWhite.b, 200)
+		-- 		Clockwork.kernel:DrawSimpleText(L(creationPanels[i].friendlyName), textX, textY - 1, color, 1, 1)
+		-- 	end
 
-			surface.SetDrawColor(foregroundColor.r, foregroundColor.g, foregroundColor.b, 200)
-			surface.DrawRect(0, progressY + progressHeight, scrW, 1)
-		end
+		-- 	surface.SetDrawColor(foregroundColor.r, foregroundColor.g, foregroundColor.b, 200)
+		-- 	surface.DrawRect(0, progressY + progressHeight, scrW, 1)
+		-- end
 
 		Clockwork.theme:Call("PostCharacterMenuPaint", self)
 	end
@@ -436,11 +440,11 @@ function PANEL:Think()
 			Clockwork.kernel:RemoveBackgroundBlur(self)
 		end
 
-		if self.characterModel then
-			if not self.characterModel.currentModel or self.characterModel.currentModel == "models/error.mdl" then
-				self.characterModel:SetAlpha(0)
-			end
-		end
+		-- if self.characterModel then
+		-- 	if not self.characterModel.currentModel or self.characterModel.currentModel == "models/error.mdl" then
+		-- 		self.characterModel:SetAlpha(0)
+		-- 	end
+		-- end
 
 		if not Clockwork.character:IsCreationProcessActive() then
 			if activePanel then
@@ -489,9 +493,11 @@ function PANEL:Think()
 		if Clockwork.Client:HasInitialized() and not Clockwork.character:IsMenuReset() then
 			self.disconnectButton:SetText(L("CharacterMenuCancel"))
 			self.disconnectButton:SizeToContents()
+			self.disconnectButton:SetPos((ScrW() / 2) - (self.disconnectButton:GetWide() / 2), ScrH() * 0.75)
 		else
 			self.disconnectButton:SetText(L("CharacterMenuLeave"))
 			self.disconnectButton:SizeToContents()
+			self.disconnectButton:SetPos((ScrW() / 2) - (self.disconnectButton:GetWide() / 2), ScrH() * 0.75)
 		end
 
 		if self.animation then
@@ -551,6 +557,8 @@ function PANEL:FadeOut(speed, Callback)
 		if self.animation then
 			self.animation:Start(speed)
 		end
+
+		Clockwork.option:PlaySound('rollover')
 	else
 		self:SetVisible(false)
 		self:SetAlpha(0)
@@ -636,7 +644,8 @@ function PANEL:ManageTargets(panel, position, alpha)
 		panel.TargetAlpha = alpha
 	end
 
-	local interval = 64 * math.EaseInOut(self.easingValue, 0.2, 0.2)
+	local moveSpeed = math.abs(panel.TargetPosition - position) * 2
+	local interval = moveSpeed * FrameTime()
 	panel.TargetPosition = math.Approach(panel.TargetPosition, position, interval)
 	panel.TargetAlpha = math.Approach(panel.TargetAlpha, alpha, interval)
 
@@ -647,69 +656,45 @@ end
 -- A function to set the panel's selected index.
 function PANEL:SetSelectedIdx(index)
 	self.selectedIdx = index
-	self.easingValue = 0
 end
 
 -- Called when the previous button is pressed.
 function PANEL:OnPrevious()
 	self.selectedIdx = math.max(self.selectedIdx - 1, 1)
-	self.easingValue = 0
 	self:MakePopup()
 end
 
 -- Called when the next button is pressed.
 function PANEL:OnNext()
 	self.selectedIdx = math.min(self.selectedIdx + 1, #self.characterPanels)
-	self.easingValue = 0
 	self:MakePopup()
 end
 
 -- Called each frame.
 function PANEL:Think()
 	self:InvalidateLayout(true)
-
-	if not self.easingValue then
-		self.easingValue = 0
-	end
-
-	self.easingValue = math.Approach(self.easingValue, 1, FrameTime())
-
-	if self.animation then
-		self.animation:Run()
-	end
-
-	while self.selectedIdx > #self.characterPanels do
-		self.selectedIdx = self.selectedIdx - 1
-	end
-
-	if self.selectedIdx == 0 then
-		self.selectedIdx = 1
-	end
-
+	if self.animation then self.animation:Run() end
+	while self.selectedIdx > #self.characterPanels do self.selectedIdx = self.selectedIdx - 1 end
+	if self.selectedIdx == 0 then self.selectedIdx = 1 end
 	if self.characterPanels[self.selectedIdx] then
 		local centerPanel = self.characterPanels[self.selectedIdx]
 		centerPanel:SetActive(true)
-
-		self:ManageTargets(centerPanel, self:GetWide() / 2 - centerPanel:GetWide() / 2, 255)
-
-		local rightX = centerPanel.x + centerPanel:GetWide() + 32
-		local leftX = centerPanel.x - 32
-
+		self:ManageTargets(centerPanel, (self:GetWide() / 2) - (centerPanel:GetWide() / 2), 255)
+		local rightX = centerPanel.x + centerPanel:GetWide() + 16
+		local leftX = centerPanel.x - 16
 		for i = self.selectedIdx - 1, 1, -1 do
 			local previousPanel = self.characterPanels[i]
-
 			if previousPanel then
 				previousPanel:SetActive(false)
 				self:ManageTargets(previousPanel, leftX - previousPanel:GetWide(), (255 / self.selectedIdx) * i)
-				leftX = previousPanel.x - 32
+				leftX = previousPanel.x - 16
 			end
 		end
-
-		for k, v in pairs(self.characterPanels) do
+		for k, v in next, self.characterPanels do
 			if k > self.selectedIdx then
 				v:SetActive(false)
 				self:ManageTargets(v, rightX, (255 / ((#self.characterPanels + 1) - self.selectedIdx)) * ((#self.characterPanels + 1) - k))
-				rightX = v.x + v:GetWide() + 32
+				rightX = v.x + v:GetWide() + 16
 			end
 		end
 	end
@@ -717,10 +702,8 @@ end
 
 -- Called when the layout should be performed.
 function PANEL:PerformLayout(w, h)
-	local scrH = ScrH()
-
-	self:SetPos(0, 96)
-	self:SetSize(ScrW(), scrH - (scrH * 0.203))
+	self:SetPos(0, (ScrH() / 2) - 256)
+	self:SetSize(ScrW(), 512)
 end
 
 vgui.Register("cwCharacterList", PANEL, "EditablePanel")
@@ -745,16 +728,15 @@ function PANEL:Init()
 	self.nameLabel = vgui.Create("cwLabelButton", self)
 	self.nameLabel:SetDisabled(true)
 	self.nameLabel:SetFont(smallTextFont)
-	self.nameLabel:SetText(string.upper(self.customData.name))
+	self.nameLabel:SetText(self.customData.name)
 	self.nameLabel:SizeToContents()
-	self.nameLabel:SetPos(0, 80)
 
 	self.factionLabel = vgui.Create("cwLabelButton", self)
 	self.factionLabel:SetDisabled(true)
 	self.factionLabel:SetFont(tinyTextFont)
-	self.factionLabel:SetText(string.upper(self.customData.faction))
+	self.factionLabel:SetText(self.customData.faction)
 	self.factionLabel:SizeToContents()
-	self.factionLabel:SetPos(0, self.nameLabel.y + self.nameLabel:GetTall() + 4)
+	self.factionLabel:SetPos(0, self.nameLabel:GetTall() + 8)
 
 	local color = Color(255, 255, 255, 255)
 	local factionTable = Clockwork.faction:FindByID(self.customData.faction)
@@ -771,34 +753,34 @@ function PANEL:Init()
 
 	self.factionLabel:OverrideTextColor(color)
 
-	local modelSize = math.min(ScrW() * 0.4, ScrH() * 0.65)
+	local modelSize = 300
 	self.characterModel = vgui.Create("cwCharacterModel", self)
 	self.characterModel:SetModel(self.customData.model)
+	self.characterModel:SetPos(0, self.factionLabel.y + self.factionLabel:GetTall() + 8)
 	self.characterModel:SetSize(modelSize, modelSize)
-	self.characterModel:SetMouseInputEnabled(true)
+	-- self.characterModel:SetMouseInputEnabled(true)
 
-	buttonY = self.factionLabel.y + self.factionLabel:GetTall() + 4
-	self.characterModel:SetPos(0, buttonY - self.characterModel:GetTall() * 0.1)
+	buttonY = self.characterModel.y + self.characterModel:GetTall() + 8
 
-	local modelPanel = self.characterModel
-	local sequence = Clockwork.plugin:Call("GetCharacterPanelSequence", modelPanel.Entity, self.customData.charTable)
-
-	if sequence then
-		modelPanel.Entity:ResetSequence(sequence)
+	local modelPanel = self.characterModel:GetModelPanel()
+	if IsValid(modelPanel) and IsValid(modelPanel.Entity) then
+		local modelEnt = modelPanel.Entity
+		if self.customData.skin then modelEnt:SetSkin(self.customData.skin) end
+		if self.customData.bodyGroups then for k, v in next, self.customData.bodyGroups do modelEnt:SetBodygroup(tonumber(k), v) end end
 	end
 
 	self.useButton = Clockwork.kernel:CreateMarkupToolTip(vgui.Create("DImageButton", self))
 	self.useButton:SetTooltip(L("UseThisCharacter"))
 	self.useButton:SetImage("icon16/tick.png")
 	self.useButton:SetSize(16, 16)
-	self.useButton:SetPos(0, buttonY)
+	self.useButton:SetPos(-10, buttonY)
 	self.useButton:SetMouseInputEnabled(true)
 
 	self.deleteButton = Clockwork.kernel:CreateMarkupToolTip(vgui.Create("DImageButton", self))
 	self.deleteButton:SetTooltip(L("DeleteThisCharacter"))
 	self.deleteButton:SetImage("icon16/cross.png")
 	self.deleteButton:SetSize(16, 16)
-	self.deleteButton:SetPos(20, buttonY)
+	self.deleteButton:SetPos(30, buttonY)
 	self.deleteButton:SetMouseInputEnabled(true)
 
 	Clockwork.plugin:Call("GetCustomCharacterButtons", self.customData.charTable, buttonsList)
@@ -837,20 +819,35 @@ function PANEL:Init()
 		})
 	end
 
-	-- Called when the button is clicked.
-	function self.deleteButton.DoClick(spawnIcon)
-		Clockwork.kernel:AddMenuFromData(nil, {
-			["Yes"] = function()
+	local function deleteConfirmation()
+		-- local message = string.format("Вы собираетесь безвозвратно удалить персонажа \"%s\". Вы уверены?", self.customData.name)
+		local message = L("DeleteCharacterConfirmation", self.customData.name)
+		Derma_Query(message, self.customData.name,
+			L("Delete"), function()
 				netstream.Start("InteractCharacter", {
 					characterID = self.customData.characterID,
 					action = "delete"
 				})
 			end,
-			["No"] = function() end
+			L("Cancel")
+		)
+	end
+
+	-- Called when the button is clicked.
+	function self.deleteButton.DoClick(spawnIcon)
+		Clockwork.kernel:AddMenuFromData(nil, {
+			[L("Yes")] = function()
+				-- netstream.Start("InteractCharacter", {
+				-- 	characterID = self.customData.characterID,
+				-- 	action = "delete"
+				-- })
+				deleteConfirmation()
+			end,
+			[L("No")] = function() end
 		})
 	end
 
-	local modelPanel = self.characterModel
+	local modelPanel = self.characterModel:GetModelPanel()
 
 	-- Called when the character model is clicked.
 	function modelPanel.DoClick(modelPanel)
@@ -859,21 +856,18 @@ function PANEL:Init()
 		if activePanel:GetSelectedModel() == self then
 			local options = {}
 
-			options["Use"] = function()
+			options[L("Select")] = function()
 				netstream.Start("InteractCharacter", {
 					characterID = self.customData.characterID,
 					action = "use"
 				})
 			end
 
-			options["Delete"] = {}
-			options["Delete"]["No"] = function() end
+			options[L("Delete")] = {}
+			options[L("Delete")][L("No")] = function() end
 
-			options["Delete"]["Yes"] = function()
-				netstream.Start("InteractCharacter", {
-					characterID = self.customData.characterID,
-					action = "delete"
-				})
+			options[L("Delete")][L("Yes")] = function()
+				deleteConfirmation()
 			end
 
 			Clockwork.plugin:Call("GetCustomCharacterOptions", self.customData.charTable, options, menu)
@@ -905,42 +899,41 @@ function PANEL:Init()
 		maxWidth = self.factionLabel:GetWide()
 	end
 
-	local widths = {
-		["Vortigaunt"] = 90,
-		["Enslaved Vortigaunt"] = 80,
-		["Antlion"] = 180,
-		["Zombie"] = 40
-	}
+	-- local widths = {
+	-- 	["Vortigaunt"] = 90,
+	-- 	["Enslaved Vortigaunt"] = 80,
+	-- 	["Antlion"] = 180,
+	-- 	["Zombie"] = 40
+	-- }
 
-	if (widths[self.customData.faction]) then
-		maxWidth = maxWidth + widths[self.customData.faction]
-	end
+	-- if (widths[self.customData.faction]) then
+	-- 	maxWidth = maxWidth + widths[self.customData.faction]
+	-- end
 
-	local labelY = self.characterModel.y + self.characterModel:GetTall() + 4
+	-- local labelY = self.characterModel.y + self.characterModel:GetTall() + 4
 
-	for k, v in pairs(labels) do
-		local label = vgui.Create("cwLabelButton", self)
-		label:SetDisabled(true)
-		label:SetFont(tinyTextFont)
-		label:SetText(string.upper(v.text))
-		label:OverrideTextColor(v.color)
-		label:SizeToContents()
-		label:SetPos(maxWidth / 2 - label:GetWide() / 2, labelY)
+	-- for k, v in pairs(labels) do
+	-- 	local label = vgui.Create("cwLabelButton", self)
+	-- 	label:SetDisabled(true)
+	-- 	label:SetFont(tinyTextFont)
+	-- 	label:SetText(string.upper(v.text))
+	-- 	label:OverrideTextColor(v.color)
+	-- 	label:SizeToContents()
+	-- 	label:SetPos(maxWidth / 2 - label:GetWide() / 2, labelY)
 
-		labelY = labelY + label:GetTall() + 4
-	end
+	-- 	labelY = labelY + label:GetTall() + 4
+	-- end
 
-	self.characterModel.x = maxWidth / 2 - self.characterModel:GetWide() / 2
-	self.nameLabel:SetPos(maxWidth / 2 - self.nameLabel:GetWide() / 2, self.nameLabel.y)
-	self.factionLabel:SetPos(maxWidth / 2 - self.factionLabel:GetWide() / 2, self.factionLabel.y)
+	self.characterModel:SetPos((maxWidth / 2) - (self.characterModel:GetWide() / 2), self.characterModel.y)
+	self.factionLabel:SetPos((maxWidth / 2) - (self.factionLabel:GetWide() / 2), self.factionLabel.y)
+	self.nameLabel:SetPos((maxWidth / 2) - (self.nameLabel:GetWide() / 2), self.nameLabel.y)
 
-	self:SetSize(maxWidth, ScrH())
+	self:SetSize(maxWidth, buttonY + 32)
 
-	local buttonAddX = (maxWidth / 2 - buttonX / 2) - 10
+	local buttonAddX = ((maxWidth / 2) - (buttonX / 2)) - 10
 	self.useButton:SetPos(self.useButton.x + buttonAddX, self.useButton.y)
 	self.deleteButton:SetPos(self.deleteButton.x + buttonAddX, self.deleteButton.y)
-
-	for k, v in pairs(self.buttonPanels) do
+	for _, v in next, self.buttonPanels do
 		v:SetPos(v.x + buttonAddX, v.y)
 	end
 end
@@ -957,7 +950,6 @@ end
 -- Called each frame.
 function PANEL:Think()
 	local markupObject = Clockwork.theme:GetMarkupObject()
-	local weaponModel = Clockwork.plugin:Call("GetCharacterPanelWeaponModel", self, self.customData.charTable)
 	local toolTip = Clockwork.plugin:Call("GetCharacterPanelToolTip", self, self.customData.charTable)
 
 	if tooltip and toolTip ~= "" then
@@ -968,12 +960,6 @@ function PANEL:Think()
 	markupObject:Title(L("CharTooltipDetailsTitle"))
 	markupObject:Add(self.customData.details or L("CharNoDetailsToDisplay"))
 
-	if weaponModel then
-		self.characterModel:SetWeaponModel(weaponModel)
-	else
-		self.characterModel:SetWeaponModel(false)
-	end
-
 	self.characterModel:SetDetails(markupObject:GetText())
 end
 
@@ -982,9 +968,12 @@ local PANEL = {}
 
 -- Called when the panel is initialized.
 function PANEL:Init()
-	self:SetPaintBackground(false)
-	self:SetAmbientLight(Color(255, 255, 255, 255))
-	Clockwork.kernel:CreateMarkupToolTip(self)
+    self:SetPaintBackground(false)
+    self.modelPanel = vgui.Create('DModelPanel', self)
+    self.modelPanel:SetAmbientLight(Color(255, 255, 255, 255))
+    function self.modelPanel.LayoutEntity(modelPanel) modelPanel:RunAnimation() end
+    self:SetCursor('none')
+    Clockwork.kernel:CreateMarkupToolTip(self)
 end
 
 -- A function to make the panel fade out.
@@ -1005,6 +994,8 @@ function PANEL:FadeOut(speed, Callback)
 		if self.animation then
 			self.animation:Start(speed)
 		end
+
+		Clockwork.option:PlaySound('rollover')
 
 		return true
 	else
@@ -1036,6 +1027,7 @@ function PANEL:FadeIn(speed, Callback)
 			self.animation:Start(speed)
 		end
 
+		Clockwork.option:PlaySound('click_release')
 		self:SetVisible(true)
 
 		return true
@@ -1051,26 +1043,38 @@ end
 
 -- A function to set the alpha of the panel.
 function PANEL:SetAlpha(alpha)
-	local color = self:GetColor()
-	self:SetColor(Color(color.r, color.g, color.b, alpha))
+	local color = self.modelPanel:GetColor()
+	self.modelPanel:SetColor(Color(color.r, color.g, color.b, alpha))
 end
 
 -- A function to get the alpha of the panel.
 function PANEL:GetAlpha(alpha)
-	local color = self:GetColor()
+	local color = self.modelPanel:GetColor()
 
 	return color.a
 end
 
 -- Called each frame.
 function PANEL:Think()
+	local entity = self.modelPanel.Entity
+	if IsValid(entity) then entity:ClearPoseParameters() end
 	if self.animation then
 		self.animation:Run()
 	end
 
-	if self.forceX then
-		self.x = self.forceX
-	end
+	-- if self.forceX then
+	-- 	self.x = self.forceX
+	-- end
+
+	self:InvalidateLayout(true)
+end
+
+function PANEL:GetModelPanel()
+	return self.modelPanel
+end
+
+function PANEL:PerformLayout(w, h)
+	self.modelPanel:SetSize(w, h)
 end
 
 -- A function to set the model details.
@@ -1078,97 +1082,36 @@ function PANEL:SetDetails(details)
 	self:SetMarkupToolTip(details)
 end
 
--- A function to set the model weapon.
-function PANEL:SetWeaponModel(weaponModel)
-	if not weaponModel and IsValid(self.weaponEntity) then
-		self.weaponEntity:Remove()
-
-		return
+function PANEL:SetModel(model)
+	self.modelPanel:SetModel(model)
+	local entity = ents.CreateClientProp(model)
+	entity:SetAngles(angle_zero)
+	entity:SetPos(vector_origin)
+	entity:Spawn()
+	local obbCenter = entity:OBBCenter()
+	obbCenter.z = obbCenter.z * 1.09
+	local distance = math.max(70, entity:GetModelRadius())
+	entity:Remove()
+	self.modelPanel:SetLookAt(obbCenter)
+	self.modelPanel:SetFOV(40)
+	self.modelPanel:SetCamPos(obbCenter + Vector(distance * 1.56, distance * 0.31, distance * 0.4))
+	entity = self.modelPanel.Entity
+	if IsValid(entity) then
+		local sequence = entity:LookupSequence('idle')
+		local leanBackAnims = {'LineIdle01', 'LineIdle02', 'LineIdle03'}
+		local leanBackAnim = entity:LookupSequence(leanBackAnims[math.random(1, #leanBackAnims)])
+		if leanBackAnim > 0 then sequence = leanBackAnim end
+		if sequence <= 0 then sequence = entity:LookupSequence('idle_unarmed') end
+		if sequence <= 0 then sequence = entity:LookupSequence('idle1') end
+		if sequence <= 0 then sequence = entity:LookupSequence('walk_all') end
+		entity:ResetSequence(sequence)
 	end
-
-	if not weaponModel and not IsValid(self.weaponEntity) or IsValid(self.weaponEntity) and self.weaponEntity:GetModel() == weaponModel then return end
-
-	if IsValid(self.weaponEntity) then
-		self.weaponEntity:Remove()
-	end
-
-	self.weaponEntity = ClientsideModel(weaponModel, RENDER_GROUP_OPAQUE_ENTITY)
-	self.weaponEntity:SetParent(self.Entity)
-	self.weaponEntity:AddEffects(EF_BONEMERGE)
 end
 
 function PANEL:OnMousePressed()
 	if self.DoClick then
 		self:DoClick()
 	end
-end
-
-local function setModelAndSequence(panel, model)
-	panel:ClockworkSetModel(model)
-
-	local entity = panel.Entity
-
-	if not IsValid(entity) then return end
-
-	local sequence = entity:LookupSequence("idle")
-	local menuSequence = Clockwork.animation:GetMenuSequence(model, true)
-
-	local leanBackAnims = {"LineIdle01", "LineIdle02", "LineIdle03"}
-
-	local leanBackAnim = entity:LookupSequence(leanBackAnims[math.random(1, #leanBackAnims)])
-
-	if leanBackAnim > 0 then
-		sequence = leanBackAnim
-	end
-
-	if menuSequence then
-		menuSequence = entity:LookupSequence(menuSequence)
-
-		if menuSequence > 0 then
-			sequence = menuSequence
-		end
-	end
-
-	if sequence < 0 then
-		sequence = entity:LookupSequence("idle_unarmed")
-	end
-
-	if sequence < 0 then
-		sequence = entity:LookupSequence("idle1")
-	end
-
-	if sequence < 0 then
-		sequence = entity:LookupSequence("walk_all")
-	end
-
-	if sequence >= 0 then
-		entity:ResetSequence(sequence)
-	end
-end
-
-function PANEL:LayoutEntity()
-	local screenW = ScrW()
-	local screenH = ScrH()
-	local fractionMX = gui.MouseX() / screenW
-	local fractionMY = gui.MouseY() / screenH
-	local entity = self.Entity
-	local x, _ = self:LocalToScreen(self:GetWide() / 2)
-	local fx = x / screenW
-
-	entity:SetPoseParameter("head_pitch", fractionMY * 80 - 30)
-	entity:SetPoseParameter("head_yaw", (fractionMX - fx) * 70)
-	entity:SetAngles(Angle(0, 45, 0))
-	entity:SetIK(false)
-
-	self:RunAnimation()
-end
-
-function PANEL:Init()
-	self:SetCursor("none")
-	self.ClockworkSetModel = self.SetModel
-	self.SetModel = setModelAndSequence
-
-	Clockwork.kernel:CreateMarkupToolTip(self)
 end
 
 vgui.Register("cwCharacterModel", PANEL, "DModelPanel")
@@ -1468,7 +1411,7 @@ function PANEL:Init()
 	self.info = Clockwork.character:GetCreationInfo()
 
 	self.classesForm = vgui.Create("DForm")
-	self.classesForm:SetName(L("MenuNameClasses"))
+	self.classesForm:SetLabel(L("MenuNameClasses"))
 	self.classesForm:SetPadding(4)
 
 	self.categoryList = vgui.Create("cwPanelList", self)
@@ -1582,13 +1525,14 @@ end
 vgui.Register("cwCharacterStageThree", PANEL, "EditablePanel")
 local PANEL = {}
 
+local skinBlacklist = {}
+
 -- Called when the panel is initialized.
 function PANEL:Init()
 	local panel = Clockwork.character:GetPanel()
 
-	self.categoryList = vgui.Create("cwPanelList", self)
+	self.categoryList = vgui.Create("DCategoryList", self)
 	self.categoryList:SetPadding(4)
-	self.categoryList:SetSpacing(0)
 	self.categoryList:SizeToContents()
 
 	self.overrideModel = nil
@@ -1618,11 +1562,9 @@ function PANEL:Init()
 	end
 
 	if not Clockwork.faction.stored[self.info.faction].GetName then
-		self.nameForm = vgui.Create("cwBasicForm", self)
-		self.nameForm:SetAutoSize(true)
+		self.nameForm = vgui.Create("DForm", self)
 		self.nameForm:SetPadding(2)
-		self.nameForm:SetSpacing(0)
-		self.nameForm:SetText(L("Name"))
+		self.nameForm:SetLabel(L("Name"))
 
 		if Clockwork.faction.stored[self.info.faction].useFullName then
 			self.fullNameTextEntry = self.nameForm:TextEntry(L("CharacterMenuFullName"))
@@ -1636,30 +1578,19 @@ function PANEL:Init()
 	end
 
 	if self.hasSelectedModel or self.hasPhysDesc then
-		if self.hasPhysDesc then
-			self.physDescForm = vgui.Create("cwBasicForm")
-			self.physDescForm:SetAutoSize(true)
-			self.physDescForm:SetPadding(4)
-			self.physDescForm:SetSpacing(4)
+		self.appearanceForm = vgui.Create("DForm")
+		self.appearanceForm:SetPadding(4)
+		self.appearanceForm:SetLabel(L("CharacterMenuAppearance"))
 
-			self.physDescForm:SetText(L("CharacterMenuPhysDesc"))
-			self.physDescForm:Help(L("CharacterMenuPhysDescHelp"))
-			self.physDescTextEntry = self.physDescForm:TextEntry()
+		if self.hasPhysDesc then
+			self.physDescTextEntry = self.appearanceForm:TextEntry('Описание')
 			self.physDescTextEntry:SetAllowNonAsciiCharacters(true)
 		end
 
 		if self.hasSelectedModel then
-			self.appearanceForm = vgui.Create("cwBasicForm")
-			self.appearanceForm:SetAutoSize(true)
-			self.appearanceForm:SetPadding(4)
-			self.appearanceForm:SetSpacing(0)
-			self.appearanceForm:SetText(L("CharacterMenuAppearance"))
-			self.appearanceForm:Help(L("CharacterMenuModelHelp"))
-
 			self.modelItemsList = vgui.Create("DPanelList", self)
 			self.modelItemsList:SetPadding(4)
 			self.modelItemsList:SetSpacing(16)
-			self.modelItemsList:SetAutoSize(true)
 			self.modelItemsList:EnableHorizontal(true)
 			self.modelItemsList:EnableVerticalScrollbar(true)
 
@@ -1681,6 +1612,19 @@ function PANEL:Init()
 
 	local informationColor = Clockwork.option:GetColor("information")
 	local lowerGender = string.lower(self.info.gender)
+	self.multitoneNumSlider = self.nameForm:NumSlider('Высота голоса', nil, -20, 20, 0)
+	self.multitoneNumSlider:SetValue(0)
+	local checkButton = vgui.Create('DButton', self.multitoneNumSlider)
+	checkButton:SetText('Прослушать')
+	checkButton:SetPos(100, 5)
+	checkButton:SetSize(100, 20)
+	function checkButton.DoClick()
+		if Clockwork.faction.stored[self.info.faction].voPreview then
+			Clockwork.faction.stored[self.info.faction].voPreview(lowerGender, self.multitoneNumSlider:GetValue())
+		else
+			Clockwork.Client:EmitSound('vo/npc/' .. lowerGender .. '01/question' .. math.random(10, 31) .. '.wav', 75, 100 + self.multitoneNumSlider:GetValue())
+		end
+	end
 	local spawnIcon = nil
 
 	for k, v in pairs(Clockwork.faction.stored) do
@@ -1705,6 +1649,38 @@ function PANEL:Init()
 
 						self.selectedSpawnIcon = spawnIcon
 						self.selectedModel = v2
+						self.selectedSkin = 0
+						local characterPanel = panel.characterModel
+						if IsValid(characterPanel) then
+							if IsValid(characterPanel.skinComboBox) then characterPanel.skinComboBox:Remove() end
+							if v.allowSkins and skinBlacklist[v2] ~= true then
+								local modelPanel = characterPanel:GetModelPanel()
+								if IsValid(modelPanel) and IsValid(modelPanel.Entity) then
+									local entityModel = modelPanel.Entity
+									local skins = entityModel:SkinCount()
+									entityModel:SetSkin(0)
+									if skins > 1 then
+										local width, height = characterPanel:GetSize()
+										local comboBox = vgui.Create("DComboBox", characterPanel)
+										comboBox:SetSize(100, 22)
+										comboBox:SetPos(width - comboBox:GetWide() - 4, height - comboBox:GetTall() - 4)
+										comboBox:SetSortItems(false)
+										comboBox.OnSelect = function(_, _, _, data)
+											if IsValid(self) and IsValid(entityModel) then
+												entityModel:SetSkin(data)
+												self.selectedSkin = data
+											end
+										end
+										for i = 0, skins - 1 do
+											if not skinBlacklist[v2] or not skinBlacklist[v2][i] then
+												comboBox:AddChoice('Skin ' .. i, i, i == 0)
+											end
+										end
+										characterPanel.skinComboBox = comboBox
+									end
+								end
+							end
+						end
 					end
 
 					self.modelItemsList:AddItem(spawnIcon)
@@ -1721,6 +1697,9 @@ function PANEL:OnNext()
 	else
 		self.info.model = self.selectedModel
 	end
+
+	self.info.tone = math.Clamp(math.floor(self.multitoneNumSlider:GetValue()), -20, 20)
+	self.info.skin = self.selectedSkin or 0
 
 	if not Clockwork.faction.stored[self.info.faction].GetName then
 		if IsValid(self.fullNameTextEntry) then
@@ -1812,6 +1791,8 @@ function PANEL:FadeOut(speed, Callback)
 		if self.animation then
 			self.animation:Start(speed)
 		end
+
+		Clockwork.option:PlaySound('rollover')
 	else
 		self:SetVisible(false)
 		self:SetAlpha(0)
@@ -1841,6 +1822,8 @@ function PANEL:FadeIn(speed, Callback)
 		if self.animation then
 			self.animation:Start(speed)
 		end
+
+		Clockwork.option:PlaySound('click_release')
 	else
 		self:SetVisible(true)
 		self:SetAlpha(255)
@@ -1863,7 +1846,8 @@ end
 -- Called when the layout should be performed.
 function PANEL:PerformLayout(w, h)
 	self.categoryList:StretchToParent(0, 0, 0, 0)
-	self:SetSize(512, math.min(self.categoryList.pnlCanvas:GetTall() + 8, ScrH() * 0.5))
+	if IsValid(self.modelItemsList) then self.modelItemsList:SetTall(256) end
+	self:SetSize(512, math.min(self.categoryList.pnlCanvas:GetTall() + 8, ScrH() * 0.6))
 end
 
 vgui.Register("cwCharacterStageTwo", PANEL, "EditablePanel")
@@ -1886,16 +1870,13 @@ function PANEL:Init()
 	self.forcedFaction = nil
 	self.info = Clockwork.character:GetCreationInfo()
 
-	self.categoryList = vgui.Create("cwPanelList", self)
+	self.categoryList = vgui.Create("DCategoryList", self)
 	self.categoryList:SetPadding(2)
-	self.categoryList:SetSpacing(0)
 	self.categoryList:SizeToContents()
 
-	self.settingsForm = vgui.Create("cwBasicForm")
-	self.settingsForm:SetAutoSize(true)
-	self.settingsForm:SetText(L("CreateCharacterStage1"))
+	self.settingsForm = vgui.Create("DForm")
+	self.settingsForm:SetLabel(L("CreateCharacterStage1"))
 	self.settingsForm:SetPadding(4)
-	self.settingsForm:SetSpacing(4)
 
 	if #factions > 1 then
 		self.settingsForm:Help(L("CharacterMenuFactionHelp"))
@@ -2070,6 +2051,8 @@ function PANEL:FadeOut(speed, Callback)
 		if self.animation then
 			self.animation:Start(speed)
 		end
+
+		Clockwork.option:PlaySound('rollover')
 	else
 		self:SetVisible(false)
 		self:SetAlpha(0)
@@ -2099,6 +2082,8 @@ function PANEL:FadeIn(speed, Callback)
 		if self.animation then
 			self.animation:Start(speed)
 		end
+
+		Clockwork.option:PlaySound('click_release')
 	else
 		self:SetVisible(true)
 		self:SetAlpha(255)
@@ -2125,173 +2110,6 @@ function PANEL:PerformLayout(w, h)
 end
 
 vgui.Register("cwCharacterStageOne", PANEL, "EditablePanel")
-local PANEL = {}
-
--- Called when the panel is initialized.
-function PANEL:Init()
-	self.categoryList = vgui.Create("cwPanelList", self)
-	self.categoryList:SetPadding(8)
-	self.categoryList:SetSpacing(8)
-	self.categoryList:SizeToContents()
-
-	self.maximumPoints = Clockwork.config:Get("max_trait_points"):Get()
-	self.selectedTraits = {}
-	self.info = Clockwork.character:GetCreationInfo()
-	self.info.traits = {}
-
-	self.traitForm = vgui.Create("cwBasicForm")
-	self.traitForm:SetAutoSize(true)
-	self.traitForm:SetPadding(8)
-	self.traitForm:SetSpacing(8)
-	self.traitForm:SetText(L("CharacterMenuTraits"))
-
-	self.helpText = self.traitForm:Help(L("YouCanSpendMorePoints", maximumPoints))
-
-	self.traitItemsList = vgui.Create("DPanelList", self)
-	self.traitItemsList:SetPadding(4)
-	self.traitItemsList:SetSpacing(16)
-	self.traitItemsList:SetAutoSize(true)
-	self.traitItemsList:EnableHorizontal(true)
-	self.traitItemsList:EnableVerticalScrollbar(true)
-	self.traitForm:AddItem(self.traitItemsList)
-	self.categoryList:AddItem(self.traitForm)
-
-	local informationColor = Clockwork.option:GetColor("information")
-
-	for k, v in pairs(Clockwork.trait:GetAll()) do
-		local traitTable = v
-		local markupObject = Clockwork.theme:GetMarkupObject()
-		markupObject:Title(L(v.name))
-		markupObject:Add(L(v.description))
-
-		if v.points < 0 then
-			markupObject:Add(L("TraitPointsGain", v.points), Clockwork.option:GetColor("trait_gain_color"))
-		else
-			markupObject:Add(L("TraitPointsLoss", v.points), Clockwork.option:GetColor("trait_loss_color"))
-		end
-
-		local traitButton = Clockwork.kernel:CreateMarkupToolTip(vgui.Create("cwImageButtonBorder", self))
-		traitButton:SetHoverColor(informationColor)
-		traitButton:SetTooltip(markupObject:GetText())
-		traitButton:SetImage(v.image .. ".png")
-		traitButton:SetSize(64, 64)
-
-		-- Called when the spawn icon is clicked.
-		function traitButton.DoClick(spawnIcon)
-			if table.HasValue(self.selectedTraits, traitTable) then
-				table.RemoveByValue(self.selectedTraits, traitTable)
-				table.RemoveByValue(self.info.traits, traitTable.uniqueID)
-				traitButton:SetColor(nil)
-
-				return
-			end
-
-			if traitTable.points < self:GetPointsLeft() then
-				traitButton:SetColor(informationColor)
-				table.insert(self.selectedTraits, traitTable)
-				table.insert(self.info.traits, traitTable.uniqueID)
-			end
-		end
-
-		self.traitItemsList:AddItem(traitButton)
-	end
-end
-
--- Called when the next button is pressed.
-function PANEL:OnNext()
-end
-
--- Called when the panel is painted.
-function PANEL:Paint(w, h)
-end
-
--- A function to make the panel fade out.
-function PANEL:FadeOut(speed, Callback)
-	if self:GetAlpha() > 0 and CW_CONVAR_FADEPANEL:GetInt() == 1 and (not self.animation or not self.animation:Active()) then
-		self.animation = Derma_Anim("Fade Panel", self, function(panel, animation, delta, data)
-			panel:SetAlpha(255 - delta * 255)
-
-			if animation.Finished then
-				panel:SetVisible(false)
-			end
-
-			if animation.Finished and Callback then
-				Callback()
-			end
-		end)
-
-		if self.animation then
-			self.animation:Start(speed)
-		end
-	else
-		self:SetVisible(false)
-		self:SetAlpha(0)
-
-		if Callback then
-			Callback()
-		end
-	end
-end
-
--- A function to make the panel fade in.
-function PANEL:FadeIn(speed, Callback)
-	if self:GetAlpha() == 0 and CW_CONVAR_FADEPANEL:GetInt() == 1 and (not self.animation or not self.animation:Active()) then
-		self.animation = Derma_Anim("Fade Panel", self, function(panel, animation, delta, data)
-			panel:SetVisible(true)
-			panel:SetAlpha(delta * 255)
-
-			if animation.Finished then
-				self.animation = nil
-			end
-
-			if animation.Finished and Callback then
-				Callback()
-			end
-		end)
-
-		if self.animation then
-			self.animation:Start(speed)
-		end
-	else
-		self:SetVisible(true)
-		self:SetAlpha(255)
-
-		if Callback then
-			Callback()
-		end
-	end
-end
-
-function PANEL:GetPointsLeft()
-	local pointsLeft = self.maximumPoints
-
-	for k, v in pairs(self.selectedTraits) do
-		pointsLeft = pointsLeft - v.points
-	end
-
-	return pointsLeft
-end
-
--- Called each frame.
-function PANEL:Think()
-	self:InvalidateLayout(true)
-
-	if self.helpText then
-		self.helpText:SetText(L("YouCanSpendMorePoints", self:GetPointsLeft()))
-	end
-
-	if self.animation then
-		self.animation:Run()
-	end
-end
-
--- Called when the layout should be performed.
-function PANEL:PerformLayout(w, h)
-	self.categoryList:StretchToParent(0, 0, 0, 0)
-	self:SetSize(512, math.min(self.categoryList.pnlCanvas:GetTall() + 8, ScrH() * 0.6))
-end
-
-vgui.Register("cwCharacterStageFive", PANEL, "EditablePanel")
 
 netstream.Hook("CharacterRemove", function(data)
 	local characters = Clockwork.character:GetAll()
@@ -2393,20 +2211,6 @@ Clockwork.character:RegisterCreationPanel("CreateCharacterStage4", "cwCharacterS
 	if table.Count(attributeTable) > 0 then
 		for k, v in pairs(attributeTable) do
 			if v.isOnCharScreen and (not v.factions or table.HasValue(v.factions, info.faction)) then return true end
-		end
-	end
-
-	return false
-end)
-
-Clockwork.character:RegisterCreationPanel("CreateCharacterStage5", "cwCharacterStageFive", nil, function(info)
-	local maximumPoints = Clockwork.config:Get("max_trait_points"):Get()
-	if maximumPoints == 0 then return false end
-	local traitTable = Clockwork.trait:GetAll()
-
-	if table.Count(traitTable) > 0 then
-		for k, v in pairs(traitTable) do
-			if not v.factions or table.HasValue(v.factions, info.faction) then return true end
 		end
 	end
 

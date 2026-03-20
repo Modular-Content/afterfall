@@ -2859,6 +2859,10 @@ end
 function Clockwork:PlayerSetModel(player)
 	cwPly:SetDefaultModel(player)
 	cwPly:SetDefaultSkin(player)
+	local bodyGroups = player:GetCharacterData("BodyGroups", {})
+	for k, v in next, (bodyGroups or {}) do
+		player:SetBodygroup(k, v)
+	end
 end
 
 --[[
@@ -4163,6 +4167,10 @@ function Clockwork:PlayerCharacterLoaded(player)
 	if playerFlags then
 		cwPly:GiveFlags(player, playerFlags)
 	end
+
+	-- че я туплю
+	-- player:SetSkin(player:QueryCharacter("skin", 0))
+	-- player:SetBodyGroups(player:QueryCharacter("bodyGroups", ""))
 end
 
 --[[

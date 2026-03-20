@@ -968,6 +968,8 @@ else -- if (SERVER) then
 		if player.cwGearTab and IsValid(player.cwGearTab[gearClass]) then return player.cwGearTab[gearClass] end
 	end
 
+	local skinBlacklist = {}
+
 	--[[
 	@codebase Shared
 	@details A function to create a character from data.
@@ -1009,13 +1011,19 @@ else -- if (SERVER) then
 		info.faction = factionTable.name
 		info.gender = data.gender
 		info.model = data.model
-		info.data = {}
+		info.skin = data.skin or 0
+		if skinBlacklist[info.skin] then info.skin = 0 end
+		info.tone = math.Clamp(data.tone or 0, -20, 20)
+		info.bodyGroups = {}
+		info.data = {BodyGroups = info.bodyGroups, Skin = info.skin, Pitch = info.tone} -- uhh
 
-		if data.plugin then
-			for k, v in pairs(data.plugin) do
-				info.data[k] = v
-			end
-		end
+		-- ???????
+		-- че за хуйня, ну типа прикинь клиент сам себе пушку так выдаст, сосите!
+		-- if data.plugin then
+		-- 	for k, v in pairs(data.plugin) do
+		-- 		info.data[k] = v
+		-- 	end
+		-- end
 
 		local classes = false
 
@@ -1227,7 +1235,7 @@ else -- if (SERVER) then
 							gender = info.gender,
 							model = info.model,
 							name = info.name,
-							data = info.data
+							data = info.data,
 						}, function()
 							cwKernel:PrintLog(LOGTYPE_GENERIC, {"LogPlayerCreateChar", player:SteamName(), info.faction, info.name})
 
@@ -4589,6 +4597,9 @@ else -- if (SERVER) then
 		if character.data["CharBanned"] then
 			info.details = "This character is banned."
 		end
+		
+		info.skin = character.data['Skin']
+		info.bodyGroups = character.data['BodyGroups']
 
 		cwPlugin:Call("PlayerAdjustCharacterScreenInfo", player, character, info)
 		netstream.Start(player, "CharacterAdd", info)
