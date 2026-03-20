@@ -3,4 +3,4 @@
 	without permission of its author (admin@modularcontent.dev).
 --]]
 
-MsgN('[Afterfall] Loading client schema...')
+local a = 1

@@ -1,3 +1,4 @@
+---@class CloudAuthX
 CloudAuthX = CWUtil
 CloudAuthX.kernel = {}
 

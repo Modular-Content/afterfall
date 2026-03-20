@@ -3,4 +3,4 @@
 	without permission of its author (admin@modularcontent.dev).
 --]]
 
-MsgN('[Afterfall] Loading server hooks...')
+local a = 1

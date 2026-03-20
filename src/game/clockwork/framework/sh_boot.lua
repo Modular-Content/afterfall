@@ -1,16 +1,16 @@
 
-if not Clockwork then
-	Clockwork = GM
-else
-	CurrentGM = Clockwork
+-- if not Clockwork then
+-- 	Clockwork = GM
+-- else
+-- 	CurrentGM = Clockwork
 
-	table.Merge(CurrentGM, GM)
-	Clockwork = nil
-	Clockwork = GM
+-- 	table.Merge(CurrentGM, GM)
+-- 	Clockwork = nil
+-- 	Clockwork = GM
 
-	table.Merge(Clockwork, CurrentGM)
-	CurrentGM = nil
-end
+-- 	table.Merge(Clockwork, CurrentGM)
+-- 	CurrentGM = nil
+-- end
 mw = mw or {}
 
 Clockwork.ClockworkFolder = Clockwork.ClockworkFolder or GM.Folder
@@ -22,6 +22,7 @@ Clockwork.Website = "http://kurozael.com"
 Clockwork.Email = "kurozael@gmail.com"
 Clockwork.KernelVersion = "0.101"
 Clockwork.KernelBuild = ""
+Clockwork.TeamBased = false
 
 function Clockwork:GetGameDescription()
 	return Clockwork.kernel:GetSchemaGamemodeName()
@@ -90,7 +91,7 @@ Clockwork.kernel:IncludeSchema()
 Clockwork.plugin:Call("ClockworkSchemaLoaded")
 
 if SERVER then
-	MsgC(Color(0, 255, 100, 255), "[Clockwork] Successfully loaded " .. Schema:GetName() .. " version " .. Clockwork.kernel:GetSchemaGamemodeVersion() .. " by " .. Schema:GetAuthor() .. ".\n")
+	MsgC(Color(0,255,100), '[ClockworkLite] Schema loaded!\n')
 end
 
 Clockwork.kernel:IncludeDirectory("commands/", true)
