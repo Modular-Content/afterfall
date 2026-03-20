@@ -971,12 +971,6 @@ function Clockwork:ClockworkConfigInitialized(key, value)
 		for k, v in pairs(cwItem:GetAll()) do
 			v.cost = 0
 		end
-	elseif key == "smooth_sprint_enabled" then
-		local players = player.GetAll()
-		for i = 1, #players do
-			local v = players[i]
-			if v:HasInitialized() then v.cwLastRunSpeed = nil end
-		end
 	elseif key == "local_voice" then
 		if value then
 			RunConsoleCommand("sv_alltalk", "0")
@@ -1064,6 +1058,12 @@ function Clockwork:ClockworkConfigChanged(key, data, previousValue, newValue)
 					end
 				end
 			end
+		end
+	elseif key == "smooth_sprint_enabled" and not newValue then
+		local players = player.GetAll()
+		for i = 1, #players do
+			local v = players[i]
+			if v:HasInitialized() then v.cwLastRunSpeed = v:GetRunSpeed() end
 		end
 	elseif key == "use_own_group_system" then
 		if newValue then
