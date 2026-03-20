@@ -1731,7 +1731,7 @@ function PANEL:OnNext()
 				return false
 			end
 
-			if not string.find(self.info.forename, "[aeiou]") or not string.find(self.info.surname, "[aeiou]") then
+			if not string.find(self.info.forename, "[aeiouAEIOUаеёиоуыэюяАЕЁИОУЫЭЮЯ]") or not string.find(self.info.surname, "[aeiouAEIOUаеёиоуыэюяАЕЁИОУЫЭЮЯ]") then
 				Clockwork.character:SetFault({"FaultNameHaveVowel"})
 
 				return false

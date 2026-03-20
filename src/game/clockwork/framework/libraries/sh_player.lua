@@ -1109,7 +1109,7 @@ else -- if (SERVER) then
 						return self:SetCreateFault(player, {"FaultNameNoSpecialChars"})
 					end
 
-					if not string.find(data.forename, "[aeiou]") or not string.find(data.surname, "[aeiou]") then
+					if not string.find(data.forename, "[aeiouAEIOUаеёиоуыэюяАЕЁИОУЫЭЮЯ]") or not string.find(data.surname, "[aeiouAEIOUаеёиоуыэюяАЕЁИОУЫЭЮЯ]") then
 						return self:SetCreateFault(player, {"FaultNameHaveVowel"})
 					end
 
