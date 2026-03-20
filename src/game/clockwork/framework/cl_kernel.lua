@@ -987,6 +987,24 @@ end
 
 --[[
 	@codebase Client
+	@details Called when the pause menu is shown.
+	@returns {Unknown}
+--]]
+function ClockworkLite:OnPauseMenuShow()
+	if cwCharacter:IsPanelOpen() then
+		if cwClient:HasInitialized() and not cwCharacter:IsMenuReset() then
+			cwCharacter:SetPanelMainMenu()
+			cwCharacter:SetPanelOpen(false)
+		else return false end
+	end
+	if cwMenu:GetOpen() then
+		local panel = cwMenu:GetPanel()
+		if panel then panel:SetOpen(false) end
+	end
+end
+
+--[[
+	@codebase Client
 	@details Called when a player presses a bind at the top level.
 	@param {Unknown} Missing description for player.
 	@param {Unknown} Missing description for bind.
