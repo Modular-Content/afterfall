@@ -1245,7 +1245,7 @@ else -- if (SERVER) then
 
 							player.cwIsCreatingChar = nil
 
-							self:UseCharacter(player, characterID)
+							-- self:UseCharacter(player, characterID)
 						end)
 					end
 				end)
