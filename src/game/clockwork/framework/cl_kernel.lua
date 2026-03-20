@@ -1468,7 +1468,23 @@ function ModularWork.Systems.Heartbeat()
 	if not IsValid(ply) then return end
 	if CurTime() < nextHeartbeatUpdate then return end
 	nextHeartbeatUpdate = CurTime() + 0.1
-	if not ply:Alive() then return end
+	if not ply:Alive() then
+		if heartbeatSound then
+			if heartbeatSound:IsPlaying() then
+				heartbeatSound:FadeOut(2)
+			else
+				heartbeatSound = nil
+			end
+		end
+		if breathSound then
+			if breathSound:IsPlaying() then
+				breathSound:FadeOut(3)
+			else
+				breathSound = nil
+			end
+		end
+		return
+	end
 	local hp = ply:Health()
 	local max = ply:GetMaxHealth()
 	if max <= 0 then return end
@@ -1498,7 +1514,7 @@ function ModularWork.Systems.Heartbeat()
 			breathSound:SetSoundLevel(0)
 			breathSound:PlayEx(0.2,100)
 		end
-		local pitch = 100 + math.Clamp(ply:GetNetVar('Pitch', 0), -20, 20)
+		local pitch = 100 + math.Clamp(ply:GetCharacterData('Pitch', 0), -20, 20)
 		local volume = math.Clamp(0.4 + (1-percent)*0.6,0,1)
 		breathSound:ChangePitch(pitch,0.5)
 		breathSound:ChangeVolume(volume,0.5)
@@ -1543,6 +1559,38 @@ timer.Create("mw_fast_networkproxy", 0.1, 0, function()
 	ModularWork.Systems.NetworkProxy()
 end)
 
+local lastDSP = -1
+local shockEndTime = 0
+local inShock = false
+
+function ModularWork.Systems.aDSP()
+    local ply = cwClient
+    if not IsValid(ply) then return end
+    if not ply:Alive() then if ply:GetDSP() ~= 0 then lastDSP = -1 ply:SetDSP(0, true) end return end
+    local curTime = CurTime()
+    if inShock and curTime < shockEndTime then return else inShock = false end
+    local hp = ply:Health()
+    local max = ply:GetMaxHealth()
+    if max <= 0 then return end
+    local percent = hp / max
+    local dsp = 0
+	-- как оригинально
+    if percent > .4 then dsp = 0 elseif percent > .3 then dsp = 30 elseif percent > .2 then dsp = 31 elseif percent > .1 then dsp = 5 else dsp = 26 end
+    if dsp ~= lastDSP then ply:SetDSP(dsp, false) lastDSP = dsp end
+end
+
+netstream.Hook('shockDSP', function(duration)
+	inShock = true
+	shockEndTime = CurTime() + duration
+	cwClient:SetDSP(32, true)
+end)
+
+netstream.Hook('resetDSP', function()
+	lastDSP = -1
+	inShock = false
+	cwClient:SetDSP(0, true)
+end)
+
 --[[
 	@codebase Client
 	@details Called each tick.
@@ -1553,7 +1601,10 @@ function Clockwork:Tick()
     if not IsValid(client) then return end
     if cwCharacter:IsPanelPolling() then ModularWork.Systems.CharacterMenu() end
    	ModularWork.Systems.MenuMusic()
+	-- КЛОКВОРК ТЕПЕРЬ ТАРКОВ ИЛИ ЧТО?
+	-- это очень пиздато, я люблю этот код
     ModularWork.Systems.Heartbeat()
+	ModularWork.Systems.aDSP()
 end
 
 timer.Create("cw_ui_update", 0.1, 0, function()

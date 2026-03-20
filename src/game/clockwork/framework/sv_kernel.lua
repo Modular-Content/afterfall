@@ -1376,6 +1376,8 @@ function Clockwork:PlayerSpawn(player)
 			player:SetHealth(factionTable.maxHealth or 100)
 			player:SetArmor(factionTable.maxArmor or 0)
 
+			netstream.Start(player, 'resetDSP')
+
 			if rank then
 				player:SetMaxHealth(rank.maxHealth or player:GetMaxHealth())
 				player:SetMaxArmor(rank.maxArmor or player:GetMaxArmor())
@@ -5067,6 +5069,9 @@ function Clockwork:EntityTakeDamage(entity, damageInfo)
 		if attacker:IsPlayer() and IsValid(attacker:GetActiveWeapon()) and cwPly:GetWeaponClass(attacker) == "weapon_crowbar" then
 			damageInfo:ScaleDamage(0.25)
 		end
+	end
+	if entity:IsPlayer() then
+		netstream.Start(player, 'shockDSP', .5)
 	end
 end
 

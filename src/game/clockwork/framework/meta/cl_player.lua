@@ -4,6 +4,17 @@ local cwPly = Clockwork.player
 ---@class Player
 local playerMeta = FindMetaTable("Player")
 _Nick = _Nick or playerMeta.Nick
+_SetDSP = _SetDSP or playerMeta.SetDSP
+
+local DSP = 0
+function playerMeta:SetDSP(dsp, fastReset)
+	DSP = dsp
+	_SetDSP(self, dsp, fastReset)
+end
+
+function playerMeta:GetDSP()
+	return DSP
+end
 
 local nickCache = {}
 function playerMeta:SteamName()
