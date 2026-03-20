@@ -789,7 +789,6 @@ function Clockwork:Initialize()
 	CW_CONVAR_ITEMESP = cwKernel:CreateClientConVar("cwItemESP", 0, false, true)
 	CW_CONVAR_PROPESP = cwKernel:CreateClientConVar("cwPropESP", 0, false, true)
 	CW_CONVAR_SPAWNESP = cwKernel:CreateClientConVar("cwSpawnESP", 0, false, true)
-	CW_CONVAR_SALEESP = cwKernel:CreateClientConVar("cwSaleESP", 0, false, true)
 	CW_CONVAR_NPCESP = cwKernel:CreateClientConVar("cwNPCESP", 0, false, true)
 	CW_CONVAR_TEXTCOLORR = cwKernel:CreateClientConVar("cwTextColorR", 255, true, true)
 	CW_CONVAR_TEXTCOLORG = cwKernel:CreateClientConVar("cwTextColorG", 200, true, true)
@@ -984,6 +983,24 @@ function Clockwork:PlayerBindPress(player, bind, bPress)
 	end
 
 	return cwPlugin:Call("TopLevelPlayerBindPress", player, bind, bPress)
+end
+
+--[[
+	@codebase Client
+	@details Called when the pause menu is shown.
+	@returns {Unknown}
+--]]
+function ClockworkLite:OnPauseMenuShow()
+	if cwCharacter:IsPanelOpen() then
+		if cwClient:HasInitialized() and not cwCharacter:IsMenuReset() then
+			cwCharacter:SetPanelMainMenu()
+			cwCharacter:SetPanelOpen(false)
+		else return false end
+	end
+	if cwMenu:GetOpen() then
+		local panel = cwMenu:GetPanel()
+		if panel then panel:SetOpen(false) end
+	end
 end
 
 --[[
@@ -2412,32 +2429,6 @@ function Clockwork:GetAdminESPInfo(info)
 				position = position,
 				text = text
 			})
-		end
-	end
-
-	if CW_CONVAR_SALEESP:GetInt() == 1 then
-		for k, v in ipairs(ents.GetAll()) do
-			if v:GetClass() == "cw_salesman" then
-				if v:IsValid() then
-					local position = v:GetPos() + Vector(0, 0, 80)
-					local saleName = v:GetNWString("Name")
-					local color = Color(255, 150, 0, 255)
-
-					table.insert(info, {
-						position = position,
-						text = {
-							{
-								text = "[Salesman]",
-								color = color
-							},
-							{
-								text = saleName,
-								color = color
-							}
-						}
-					})
-				end
-			end
 		end
 	end
 

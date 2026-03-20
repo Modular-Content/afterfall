@@ -23,5 +23,8 @@
         "lowercase-global"
     ],
     "Lua.workspace.checkThirdParty": false,
-    "Lua.workspace.maxPreload": 10000
+    "Lua.workspace.maxPreload": 10000,
+    "Lua.diagnostics.globals": [
+        "CWUtil"
+    ]
 }
