@@ -4456,6 +4456,13 @@ end
 	@returns {Unknown}
 --]]
 function Clockwork:PlayerAdjustRadioInfo(player, info)
+	for _, v in ipairs(_player.GetAll()) do
+		if v:HasInitialized() then
+			if v:Team() == player:Team() then
+				info.listeners[v] = v
+			end
+		end
+	end
 end
 
 --[[

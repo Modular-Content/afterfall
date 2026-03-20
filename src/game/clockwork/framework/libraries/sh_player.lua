@@ -2822,19 +2822,19 @@ else -- if (SERVER) then
 
 		cwPlugin:Call("PlayerAdjustRadioInfo", player, info)
 
-		for k, v in pairs(info.listeners) do
-			if type(k) == "Player" then
-				listeners[k] = k
-			elseif type(v) == "Player" then
-				listeners[v] = v
+		local listenerLookup = {}
+		for _, v in pairs(info.listeners) do
+			if type(v) == 'Player' then
+				listeners[#listeners + 1] = v
+				listenerLookup[v] = true
 			end
 		end
 
 		if not info.noEavesdrop then
-			for k, v in ipairs(cwPlayer.GetAll()) do
-				if v:HasInitialized() and not listeners[v] then
+			for _, v in ipairs(cwPlayer.GetAll()) do
+				if v:HasInitialized() and not listenerLookup[v] then
 					if v:GetShootPos():Distance(player:GetShootPos()) <= cwCfg:Get("talk_radius"):Get() then
-						eavesdroppers[v] = v
+						eavesdroppers[#eavesdroppers + 1] = v
 					end
 				end
 			end
