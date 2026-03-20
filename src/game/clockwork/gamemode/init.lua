@@ -66,5 +66,5 @@ include 'clockwork/framework/sv_cax_patch.lua'
 include 'clockwork/framework/sv_kernel.lua'
 local t = math.Round(os.clock()-sT,3)
 if r then ClockworkLite:Initialize() end
-MsgC(mC, r and 'AutoRefresh handled in ' .. t .. ' second(s)\n' or 'Framework loading took ' .. t .. ' second(s)\n')
+MsgC(mC, r and '[ClockworkLite] AutoRefresh handled in ' .. t .. ' second(s)\n' or '[ClockworkLite] Framework loading took ' .. t .. ' second(s)\n')
 table.Merge(GM,ClockworkLite)
