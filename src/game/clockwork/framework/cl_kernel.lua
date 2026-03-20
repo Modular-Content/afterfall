@@ -417,6 +417,13 @@ netstream.Hook("Notification", function(data)
 	end
 end)
 
+netstream.Hook('RefreshMenu', function()
+	if not Clockwork.menu:GetOpen() then return end
+	local panel = Clockwork.menu:GetPanel()
+	if not (panel and IsValid(panel)) then return end
+	panel:Rebuild()
+end)
+
 --[[
 	@codebase Client
 	@details Called to display a HUD notification when a weapon has been picked up. (Used to override GMOD function)
@@ -777,7 +784,6 @@ function Clockwork:Initialize()
 	CW_CONVAR_VIGNETTE = cwKernel:CreateClientConVar("cwShowVignette", 0, true, true)
 	CW_CONVAR_CROSSHAIR = cwKernel:CreateClientConVar("cwShowCrosshair", 1, true, true)
 	CW_CONVAR_CROSSHAIRDYNAMIC = cwKernel:CreateClientConVar("cwShowCrosshairDynamic", 0, true, true)
-	CW_CONVAR_ESPTIME = cwKernel:CreateClientConVar("cwESPTime", 1, true, true)
 	CW_CONVAR_ADMINESP = cwKernel:CreateClientConVar("cwAdminESP", 0, true, true)
 	CW_CONVAR_ESPBARS = cwKernel:CreateClientConVar("cwESPBars", 1, true, true)
 	CW_CONVAR_ITEMESP = cwKernel:CreateClientConVar("cwItemESP", 0, false, true)
@@ -838,7 +844,7 @@ function Clockwork:ClockworkInitialized()
 	end
 	
 	local weapon = weapons.GetStored("gmod_tool")
-	local logoFile = "ug_clockwork/logo/002.png"
+	local logoFile = "clockwork/logo/002.png"
 
 	-- Capitalize tool gun text on weapon scroll.
 	if (weapon) then

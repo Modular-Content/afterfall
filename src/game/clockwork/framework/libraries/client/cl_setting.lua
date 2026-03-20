@@ -183,7 +183,6 @@ function Clockwork.setting:AddSettings()
 		Clockwork.setting:AddCheckBox("Admin ESP", "Draw ESP Bars.", "cwESPBars", "Whether or not to draw progress bars for certain values.", function() return Clockwork.player:IsAdmin(Clockwork.Client) end)
 		Clockwork.setting:AddCheckBox("Admin ESP", "Show Item Entities.", "cwItemESP", "Whether or not to view items in the admin ESP.", function() return Clockwork.player:IsAdmin(Clockwork.Client) end)
 		Clockwork.setting:AddCheckBox("Admin ESP", "Show Salesmen Entities.", "cwSaleESP", "Whether or not to view salesmen in the admin ESP.", function() return Clockwork.player:IsAdmin(Clockwork.Client) end)
-		Clockwork.setting:AddNumberSlider("Admin ESP", "ESP Interval:", "cwESPTime", 0, 2, 0, "The amount of time between ESP checks.", function() return Clockwork.player:IsAdmin(Clockwork.Client) end)
 
 		Clockwork.setting.SettingsAdded = true
 	end

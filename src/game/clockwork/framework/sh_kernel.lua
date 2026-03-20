@@ -2631,13 +2631,9 @@ else
 	--]]
 	function Clockwork.kernel:DrawAdminESP()
 		local colorWhite = Clockwork.option:GetColor("white")
-		local curTime = UnPredictedCurTime()
 
-		if not Clockwork.NextGetESPInfo or curTime >= Clockwork.NextGetESPInfo then
-			Clockwork.NextGetESPInfo = curTime + (CW_CONVAR_ESPTIME:GetInt() or 1)
-			self.ESPInfo = {}
-			Clockwork.plugin:Call("GetAdminESPInfo", self.ESPInfo)
-		end
+		self.ESPInfo = {}
+		Clockwork.plugin:Call("GetAdminESPInfo", self.ESPInfo)
 
 		for k, v in pairs(self.ESPInfo) do
 			local position = v.position:ToScreen()
