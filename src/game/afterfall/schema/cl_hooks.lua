@@ -3,10 +3,11 @@
 	without permission of its author (admin@modularcontent.dev).
 --]]
 
+local ClockworkLite = ClockworkLite
+local cwlConfig = ClockworkLite.config
+
 function Schema:GetCinematicIntroInfo()
-	return {
-		credits = 'Разработчики сервера: Modular Content',
-		title = Clockwork.config:Get('intro_text_big'):Get(),
-		text = Clockwork.config:Get('intro_text_small'):Get(),
-	}
+	local smallText = cwlConfig:Get('intro_text_small'):Get()
+	if smallText:find '%%d' then smallText = smallText:format(os.date('%Y')) end
+	return {credits = 'Разработчики сервера: Modular Content', title = cwlConfig:Get('intro_text_big'):Get(), text = smallText}
 end

@@ -3255,7 +3255,7 @@ else
 
 		if x + cornerSize < x + width and y + cornerSize < y + height then
 			surface.SetDrawColor(gradientAlpha, gradientAlpha, gradientAlpha, gradientAlpha)
-			surface.SetMaterial(self:GetGradientTexture())
+			surface.SetTexture(ClockworkLite.DefaultGradient)
 			surface.DrawTexturedRect(x + cornerSize, y + cornerSize, width - cornerSize * 2, height - cornerSize * 2)
 		end
 	end
@@ -3299,7 +3299,7 @@ else
 		local boxHeight = boxInfo.textHeight + 8
 
 		if boxInfo.drawBackground then
-			SLICED_PLAYER_INFO:Draw(x, y, width, boxHeight, 4, foregroundColor, 50)
+			self:DrawTexturedGradientBox(boxInfo.cornerSize, x, y, width, boxHeight, foregroundColor, 50)
 		end
 
 		self:DrawInfo(text, x + 8, y + boxHeight / 2, colorInfo, 255, true, function(x, y, width, height) return x, y - height / 2 end)

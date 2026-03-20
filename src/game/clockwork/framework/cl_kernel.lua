@@ -995,7 +995,8 @@ function ClockworkLite:OnPauseMenuShow()
 		if cwClient:HasInitialized() and not cwCharacter:IsMenuReset() then
 			cwCharacter:SetPanelMainMenu()
 			cwCharacter:SetPanelOpen(false)
-		else return false end
+		end
+		return false
 	end
 	if cwMenu:GetOpen() then
 		local panel = cwMenu:GetPanel()

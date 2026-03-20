@@ -29,8 +29,8 @@ end
 
 SWEP.Category = "Clockwork"
 SWEP.HoldType = "fist"
-SWEP.Spawnable = false
-SWEP.AdminSpawnable = false
+SWEP.Spawnable = true
+SWEP.AdminOnly = true
 SWEP.ViewModel = "models/weapons/c_arms.mdl"
 SWEP.WorldModel = ""
 SWEP.UseHands = true

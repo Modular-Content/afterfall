@@ -3,14 +3,25 @@
 	without permission of its author (admin@modularcontent.dev).
 --]]
 
-Clockwork.kernel:IncludePrefixed 'cl_schema.lua'
-Clockwork.kernel:IncludePrefixed 'sh_hooks.lua'
-Clockwork.kernel:IncludePrefixed 'cl_hooks.lua'
-Clockwork.kernel:IncludePrefixed 'cl_theme.lua'
+local ClockworkLite = ClockworkLite
+local cwlKernel = ClockworkLite.kernel
+local cwlConfig = ClockworkLite.config
+local cwlQuiz = ClockworkLite.quiz
+
+cwlKernel:IncludePrefixed 'cl_schema.lua'
+cwlKernel:IncludePrefixed 'sh_hooks.lua'
+cwlKernel:IncludePrefixed 'cl_hooks.lua'
+cwlKernel:IncludePrefixed 'cl_theme.lua'
 if SERVER then
-	Clockwork.kernel:IncludePrefixed 'sv_schema.lua'
-	Clockwork.kernel:IncludePrefixed 'sv_hooks.lua'
+	cwlKernel:IncludePrefixed 'sv_schema.lua'
+	cwlKernel:IncludePrefixed 'sv_hooks.lua'
 end
+
+cwlConfig:ShareKey 'intro_text_small'
+cwlConfig:ShareKey 'intro_text_big'
+
+cwlQuiz:SetEnabled(true)
+cwlQuiz:AddQuestion('выметайтесь вон', 1, 'uwu')
 
 FACTION_CITIZEN = 'Гражданин'
 

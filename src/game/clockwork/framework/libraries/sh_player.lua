@@ -697,8 +697,11 @@ if CLIENT then
 	@returns {Unknown}
 --]]
 	function Clockwork.player:GetRagdollEntity(player)
-		local ragdollEntity = player:GetNetVar("Ragdoll")
-		if IsValid(ragdollEntity) then return ragdollEntity end
+		local idx = player:GetNetVar('Ragdoll')
+		if idx then
+			local ragdollEntity = Entity(idx)
+			if IsValid(ragdollEntity) then return ragdollEntity end
+		end
 	end
 
 	--[[
@@ -4234,7 +4237,7 @@ else -- if (SERVER) then
 
 				player.cwRagdollPaused = nil
 				player:SetNetVar("IsRagdoll", state)
-				player:SetNetVar("Ragdoll", ragdoll)
+				player:SetNetVar("Ragdoll", ragdoll:EntIndex())
 
 				if state ~= RAGDOLL_FALLENOVER then
 					self:GiveDeathCode(player)
@@ -4312,7 +4315,7 @@ else -- if (SERVER) then
 
 					self:SetUnragdollTime(player, false)
 					player:SetNetVar("IsRagdoll", RAGDOLL_NONE)
-					player:SetNetVar("Ragdoll", NULL)
+					player:SetNetVar("Ragdoll")
 					cwPlugin:Call("PlayerUnragdolled", player, state, ragdollTable)
 					player.cwRagdollPaused = nil
 					player.cwRagdollTab = {}
