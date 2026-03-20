@@ -29,12 +29,14 @@ do
 	function ClockworkLite:StartCommand(ply, cmd)
 		local wep = ply:GetActiveWeapon()
 		if not IsValid(wep) then return end
-		if wep:GetClass() ~= 'weapon_pistol' then return end
-		local now = CurTime()
-		local nextShootTime = SERVER and ply.cwNextShootTime or ply:GetNetVar('NextShootTime', 0)
-		if nextShootTime and now < nextShootTime then cmd:RemoveKey(IN_ATTACK) return end
-		local nextFire = customFireDelay[wep]
-		if nextFire and now < nextFire then cmd:RemoveKey(IN_ATTACK) return end
-		if not cwPlayer:GetWeaponRaised(ply, true) then cmd:RemoveKey(IN_ATTACK) return end
+		if wep:GetClass() == 'weapon_smg1' then if not cwPlayer:GetWeaponRaised(ply, true) then cmd:RemoveKey(IN_ATTACK2) end return end
+		if wep:GetClass() ~= 'weapon_pistol' then
+			local now = CurTime()
+			local nextShootTime = SERVER and ply.cwNextShootTime or ply:GetNetVar('NextShootTime', 0)
+			if nextShootTime and now < nextShootTime then cmd:RemoveKey(IN_ATTACK) return end
+			local nextFire = customFireDelay[wep]
+			if nextFire and now < nextFire then cmd:RemoveKey(IN_ATTACK) return end
+			if not cwPlayer:GetWeaponRaised(ply, true) then cmd:RemoveKey(IN_ATTACK) return end
+		end
 	end
 end
