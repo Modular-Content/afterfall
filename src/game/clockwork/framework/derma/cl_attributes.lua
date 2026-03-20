@@ -114,7 +114,7 @@ function PANEL:Rebuild()
 		end
 	else
 		local label = vgui.Create("cwInfoText", self)
-		label:SetText(L("NoAccessToAttributes", Clockwork.option:Translate("name_attributes", true)))
+		label:SetText(L("NoAccessToAttributes", Clockwork.option:Translate("name_attributes_lang", true))) -- потому-что У вас нету доступа к просмотру ваших Навыки! выглядит ужасно
 		label:SetInfoColor("red")
 		self.panelList:AddItem(label)
 	end

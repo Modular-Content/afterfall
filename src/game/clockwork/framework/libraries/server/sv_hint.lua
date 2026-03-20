@@ -52,7 +52,7 @@ function Clockwork.hint:Distribute()
 --	local hintInterval = Clockwork.config:Get("hint_interval"):Get()
 	if not hintText then return end
 
-	for k, v in pairs(cwPlayer.GetAll()) do
+	for k, v in ipairs(cwPlayer.GetAll()) do
 		if v:HasInitialized() and v:GetInfoNum("cwShowHints", 1) == 1 and not v:IsViewingStarterHints() then
 			if not Callback or Callback(v) ~= false then
 				self:Send(v, hintText, 6, nil, true)
@@ -90,7 +90,7 @@ end
 	@param {Color} The color of the hint text.
 --]]
 function Clockwork.hint:SendCenterAll(text, delay, color)
-	for k, v in pairs(cwPlayer.GetAll()) do
+	for k, v in ipairs(cwPlayer.GetAll()) do
 		if v:HasInitialized() then
 			self:SendCenter(v, text, delay, color)
 		end
@@ -125,7 +125,7 @@ end
 	@param {Color} The color of the hint text.
 --]]
 function Clockwork.hint:SendAll(text, delay, color)
-	for k, v in pairs(cwPlayer.GetAll()) do
+	for k, v in ipairs(cwPlayer.GetAll()) do
 		if v:HasInitialized() then
 			self:Send(v, text, delay, color)
 		end

@@ -84,7 +84,7 @@ function Clockwork.bans:Add(identifier, duration, reason, Callback, bSaveless)
 		identifier = string.upper(identifier)
 	end
 
-	for k, v in pairs(cwPlayer.GetAll()) do
+	for k, v in ipairs(cwPlayer.GetAll()) do
 		local playerIP = v:IPAddress()
 		local playerSteam = v:SteamID()
 

@@ -9,10 +9,12 @@ local string = string
 local table = table
 local game = game
 
+-- у клокворка настолько нищая система инклюда, что приходится так делать
+-- в честь этого я в инклюд добавлю order-загрузку, а то развели тут хуйню
 --[[ We need the netstream library to add the hooks! --]]
-if not netstream then
-	include("sh_netstream.lua")
-end
+-- if not netstream then
+-- 	include("sh_netstream.lua")
+-- end
 
 Clockwork.config = Clockwork.kernel:NewLibrary("Config")
 Clockwork.config.indexes = Clockwork.config.indexes or {}
@@ -537,7 +539,7 @@ if SERVER then
 		@param {Unknown} Missing description for needsRestart.
 		@returns {Unknown}
 	--]]
-	function Clockwork.config:Add(key, value, isShared, isGlobal, isStatic, isPrivate, needsRestart)
+	function Clockwork.config:Add(key, value, isShared, isGlobal, isStatic, isPrivate, needsRestart, refreshMenu)
 		if self:IsValidValue(value) then
 			if not self.stored[key] then
 				self.stored[key] = {
@@ -547,6 +549,7 @@ if SERVER then
 					isShared = isShared,
 					isStatic = isStatic,
 					isGlobal = isGlobal,
+					refreshMenu = refreshMenu,
 					default = value,
 					value = value
 				}
@@ -670,6 +673,10 @@ if SERVER then
 
 				if self.data.value ~= previousValue and Clockwork.config:HasInitialized() then
 					Clockwork.plugin:Call("ClockworkConfigChanged", self.key, self.data, previousValue, self.data.value)
+
+					if self.data.refreshMenu then
+						netstream.Start(nil, "RefreshMenu")
+					end
 				end
 			end
 

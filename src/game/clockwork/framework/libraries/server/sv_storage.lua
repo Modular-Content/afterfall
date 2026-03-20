@@ -4,21 +4,20 @@ local pairs = pairs
 
 Clockwork.storage = Clockwork.kernel:NewLibrary("Storage")
 
-util.AddNetworkString("cwStorageStart")
-util.AddNetworkString("cwStorageClose")
-util.AddNetworkString("cwStorageCash")
-util.AddNetworkString("cwStorageWeight")
-util.AddNetworkString("cwStorageSpace")
-util.AddNetworkString("cwStorageGive")
-util.AddNetworkString("cwStorageTake")
-
+-- util.AddNetworkString("cwStorageStart")
+-- util.AddNetworkString("cwStorageClose")
+-- util.AddNetworkString("cwStorageCash")
+-- util.AddNetworkString("cwStorageWeight")
+-- util.AddNetworkString("cwStorageSpace")
+-- util.AddNetworkString("cwStorageGive")
+-- util.AddNetworkString("cwStorageTake")
 
 -- small helpers --------------------------------------------------------------
 
 -- Send a net message to all players who are currently viewing the same
 -- storage inventory table as `inventory`.
 local function SendToInventoryViewers(inventory, sendFunc)
-	for _, ply in pairs(cwPlayer.GetAll()) do
+	for _, ply in ipairs(cwPlayer.GetAll()) do
 		if ply:HasInitialized() and ply:GetStorageTable() then
 			if Clockwork.storage:Query(ply, "inventory") == inventory then
 				sendFunc(ply)
@@ -30,28 +29,24 @@ end
 -- Chunked iteration helper (synchronous across several ticks).
 -- Calls `work(itemKey)` for up to `chunkSize` keys per tick.
 local function StreamKeysOverTicks(timerName, owner, keys, chunkSize, work)
-	chunkSize = chunkSize or 10
-	local i = 1
-	local reps = math.ceil(#keys / chunkSize)
-
-	timer.Create(timerName, 0, reps, function()
-		if owner ~= nil and not IsValid(owner) then return end
-		for _ = 1, chunkSize do
-			local k = keys[i]
-			if not k then return end
-			work(k)
-			i = i + 1
-		end
-	end)
-end
-
--- net write for a single item definition entry (ID + data table).
-local function NetWriteItemEntry(entry)
-	-- entry = { id = <uint>, data = <table> }
-	net.WriteUInt(entry.id or 0, 32)
-	-- Keep this as a table because item custom data schema is mod-dependent.
-	-- It's far smaller than writing whole inventories, and we also chunk.
-	net.WriteTable(entry.data or {})
+    assert(type(timerName) == 'string', 'timerName must be a string')
+    assert(type(keys) == 'table', 'keys must be a table')
+    assert(type(work) == 'function', 'work must be a function')
+    chunkSize = chunkSize or 10
+    local totalKeys = #keys
+    local currentIndex = 1
+    if owner ~= nil and not IsValid(owner) then return end
+    local iterations = math.ceil(totalKeys / chunkSize)
+    timer.Create(timerName, 0, iterations, function()
+        if owner ~= nil and not IsValid(owner) then timer.Remove(timerName) return end
+        for _ = 1, chunkSize do
+            if currentIndex > totalKeys then timer.Remove(timerName) return end
+            local key = keys[currentIndex]
+            currentIndex = currentIndex + 1
+            local success, err = pcall(work, key)
+            if not success then timer.Remove(timerName) error('Error in work function:' .. tostring(err)) end
+        end
+    end)
 end
 
 -------------------------------------------------------------------------------
@@ -125,9 +120,10 @@ function Clockwork.storage:Close(player, bServer)
 	end
 
 	if not bServer then
-		net.Start("cwStorageClose")
-			net.WriteBool(true)
-		net.Send(player)
+		-- net.Start("cwStorageClose")
+		-- 	net.WriteBool(true)
+		-- net.Send(player)
+		netstream.Start(player, "cwStorageClose")
 	end
 
 	player.cwStorageTab = nil
@@ -217,13 +213,21 @@ function Clockwork.storage:Open(player, data)
 	player.cwStorageTab = data
 
 	-- lightweight start payload
-	net.Start("cwStorageStart")
-		net.WriteBool(data.noCashWeight)
-		net.WriteBool(data.noCashSpace)
-		net.WriteBool(data.isOneSided)
-		net.WriteEntity(data.entity)
-		net.WriteString(data.name or "")
-	net.Send(player)
+	-- net.Start("cwStorageStart")
+	-- 	net.WriteBool(data.noCashWeight)
+	-- 	net.WriteBool(data.noCashSpace)
+	-- 	net.WriteBool(data.isOneSided)
+	-- 	net.WriteEntity(data.entity)
+	-- 	net.WriteString(data.name or "")
+	-- net.Send(player)
+
+	netstream.Start(player, "cwStorageStart", {
+		noCashWeight = data.noCashWeight,
+		noCashSpace = data.noCashSpace,
+		isOneSided = data.isOneSided,
+		entity = data.entity,
+		name = data.name or "",
+	})
 
 	self:UpdateCash(player, data.cash)
 	self:UpdateWeight(player, data.weight)
@@ -251,9 +255,10 @@ function Clockwork.storage:UpdateCash(player, cash)
 	local inventory = self:Query(player, "inventory")
 	SendToInventoryViewers(inventory, function(viewer)
 		viewer.cwStorageTab.cash = cash
-		net.Start("cwStorageCash")
-			net.WriteInt(cash or 0, 32)
-		net.Send(viewer)
+		-- net.Start("cwStorageCash")
+		-- 	net.WriteInt(cash or 0, 32)
+		-- net.Send(viewer)
+		netstream.Start(viewer, "cwStorageCash", cash or 0)
 	end)
 end
 
@@ -269,9 +274,10 @@ function Clockwork.storage:UpdateWeight(player, weight)
 	local inventory = self:Query(player, "inventory")
 	SendToInventoryViewers(inventory, function(viewer)
 		viewer.cwStorageTab.weight = weight
-		net.Start("cwStorageWeight")
-			net.WriteInt(weight or 0, 32)
-		net.Send(viewer)
+		-- net.Start("cwStorageWeight")
+		-- 	net.WriteInt(weight or 0, 32)
+		-- net.Send(viewer)
+		netstream.Start(viewer, "cwStorageWeight", weight or 0)
 	end)
 end
 
@@ -287,9 +293,10 @@ function Clockwork.storage:UpdateSpace(player, space)
 	local inventory = self:Query(player, "inventory")
 	SendToInventoryViewers(inventory, function(viewer)
 		viewer.cwStorageTab.space = space
-		net.Start("cwStorageSpace")
-			net.WriteInt(space or 0, 32)
-			net.Send(viewer)
+		-- net.Start("cwStorageSpace")
+		-- 	net.WriteInt(space or 0, 32)
+		-- net.Send(viewer)
+		netstream.Start(viewer, "cwStorageSpace", space or 0)
 	end)
 end
 
@@ -355,7 +362,7 @@ function Clockwork.storage:SyncCash(player)
 	local cash       = player:GetCash()
 
 	if Clockwork.config:Get("cash_enabled"):Get() then
-		for _, v in pairs(cwPlayer.GetAll()) do
+		for _, v in ipairs(cwPlayer.GetAll()) do
 			if v:HasInitialized() and self:Query(v, "inventory") == inventory then
 				recipients[#recipients + 1] = v
 				local storageTable = v:GetStorageTable()
@@ -366,9 +373,10 @@ function Clockwork.storage:SyncCash(player)
 
 	if #recipients > 0 then
 		for _, r in pairs(recipients) do
-			net.Start("cwStorageCash")
-				net.WriteInt(cash or 0, 32)
-			net.Send(r)
+			-- net.Start("cwStorageCash")
+			-- 	net.WriteInt(cash or 0, 32)
+			-- net.Send(r)
+			netstream.Start(r, "cwStorageCash", cash or 0)
 		end
 	end
 end
@@ -388,7 +396,7 @@ function Clockwork.storage:SyncItem(player, itemTable)
 	definition.index = nil
 	local viewers = {}
 
-	for _, v in pairs(cwPlayer.GetAll()) do
+	for _, v in ipairs(cwPlayer.GetAll()) do
 		if v:HasInitialized() and self:Query(v, "inventory") == inventory then
 			viewers[#viewers + 1] = v
 		end
@@ -399,21 +407,27 @@ function Clockwork.storage:SyncItem(player, itemTable)
 	if player:HasItemInstance(itemTable) then
 		-- Gave into storage (storage gained item)
 		for _, r in pairs(viewers) do
-			net.Start("cwStorageGive")
-				-- one item entry
-				net.WriteString(itemTable("uniqueID")) -- base item uniqueID
-				net.WriteUInt(1, 12) -- count
-				NetWriteItemEntry({ id = definition.itemID, data = definition.data })
-			net.Send(r)
+			-- net.Start("cwStorageGive")
+			-- 	-- one item entry
+			-- 	net.WriteString(itemTable("uniqueID")) -- base item uniqueID
+			-- 	net.WriteUInt(1, 12) -- count
+			-- 	NetWriteItemEntry({ id = definition.itemID, data = definition.data })
+			-- net.Send(r)
+			netstream.Start(r, "cwStorageGive", {
+				uniqueID = itemTable("uniqueID"),
+				count = 1,
+				entry = {id = definition.itemID, data = definition.data},
+			})
 		end
 	else
 		-- Took from storage (storage lost item)
 		local sig = Clockwork.item:GetSignature(itemTable)
 		for _, r in pairs(viewers) do
-			net.Start("cwStorageTake")
-				-- signature is typically a table (unique identifiers); keep as table
-				net.WriteTable(sig)
-			net.Send(r)
+			-- net.Start("cwStorageTake")
+			-- 	-- signature is typically a table (unique identifiers); keep as table
+			-- 	net.WriteTable(sig)
+			-- net.Send(r)
+			netstream.Start(r, "cwStorageTake", sig)
 		end
 	end
 end
@@ -455,11 +469,16 @@ function Clockwork.storage:GiveTo(player, itemTable)
 
 	-- notify viewers
 	SendToInventoryViewers(inventory, function(r)
-		net.Start("cwStorageGive")
-			net.WriteString(itemTable("uniqueID"))
-			net.WriteUInt(1, 12)
-			NetWriteItemEntry({ id = definition.itemID, data = definition.data })
-		net.Send(r)
+		-- net.Start("cwStorageGive")
+		-- 	net.WriteString(itemTable("uniqueID"))
+		-- 	net.WriteUInt(1, 12)
+		-- 	NetWriteItemEntry({ id = definition.itemID, data = definition.data })
+		-- net.Send(r)
+		netstream.Start(r, "cwStorageGive", {
+			uniqueID = itemTable("uniqueID"),
+			count = 1,
+			entry = {id = definition.itemID, data = definition.data},
+		})
 	end)
 
 	player:TakeItem(itemTable)
@@ -509,7 +528,7 @@ function Clockwork.storage:TakeFrom(player, itemTable)
 			storageTable.entity:TakeItem(itemTable)
 		end
 
-		for _, v in pairs(cwPlayer.GetAll()) do
+		for _, v in ipairs(cwPlayer.GetAll()) do
 			if v:HasInitialized() and self:Query(v, "inventory") == inventory then
 				viewers[#viewers + 1] = v
 			end
@@ -517,9 +536,10 @@ function Clockwork.storage:TakeFrom(player, itemTable)
 
 		local sig = Clockwork.item:GetSignature(itemTable)
 		for _, r in pairs(viewers) do
-			net.Start("cwStorageTake")
-				net.WriteTable(sig)
-			net.Send(r)
+			-- net.Start("cwStorageTake")
+			-- 	net.WriteTable(sig)
+			-- net.Send(r)
+			netstream.Start(r, "cwStorageTake", sig)
 		end
 
 		if storageTable.OnTakeItem and storageTable.OnTakeItem(player, storageTable, itemTable) then
@@ -558,19 +578,24 @@ function Clockwork.storage:UpdateByID(player, uniqueID)
 	local itemList = {}
 	for _, v in pairs(inventory[uniqueID]) do
 		local definition = Clockwork.item:GetDefinition(v, true)
-		itemList[#itemList + 1] = { id = definition.itemID, data = definition.data }
+		itemList[#itemList + 1] = {id = definition.itemID, data = definition.data}
 	end
 
 	-- Send in chunks
 	local chunkSize = 10
 	for i = 1, #itemList, chunkSize do
 		local count = math.min(chunkSize, #itemList - i + 1)
-		net.Start("cwStorageGive")
-			net.WriteString(itemTable("uniqueID"))
-			net.WriteUInt(count, 12)
-			for j = i, i + count - 1 do
-				NetWriteItemEntry(itemList[j])
-			end
-		net.Send(player)
+		-- net.Start("cwStorageGive")
+		-- 	net.WriteString(itemTable("uniqueID"))
+		-- 	net.WriteUInt(count, 12)
+		-- 	for j = i, i + count - 1 do
+		-- 		NetWriteItemEntry(itemList[j])
+		-- 	end
+		-- net.Send(player)
+		netstream.Start(player, "cwStorageGive", {
+			uniqueID = itemTable("uniqueID"),
+			count = count,
+			entries = {unpack(itemList, i, i + count - 1)},
+		})
 	end
 end

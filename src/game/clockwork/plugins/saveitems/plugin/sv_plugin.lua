@@ -25,9 +25,10 @@ end
 function cwSaveItems:SaveShipments()
 	local shipments = {}
 
-	for k, v in pairs(ents.FindByClass("cw_shipment")) do
+	for k, v in ipairs(ents.FindByClass("cw_shipment")) do
 		local physicsObject = v:GetPhysicsObject()
 		local itemTable = v:GetItemTable()
+		if not itemTable then continue end
 		local bMoveable = nil
 
 		if IsValid(physicsObject) then
@@ -76,7 +77,7 @@ end
 function cwSaveItems:SaveItems()
 	local items = {}
 
-	for k, v in pairs(ents.FindByClass("cw_item")) do
+	for k, v in ipairs(ents.FindByClass("cw_item")) do
 		local physicsObject = v:GetPhysicsObject()
 		local itemTable = v:GetItemTable()
 		local bMoveable = false

@@ -23,7 +23,7 @@ end
 function cwSaveCash:SaveCash()
 	local cash = {}
 
-	for k, v in pairs(ents.FindByClass("cw_cash")) do
+	for k, v in ipairs(ents.FindByClass("cw_cash")) do
 		local physicsObject = v:GetPhysicsObject()
 		local bMoveable = nil
 

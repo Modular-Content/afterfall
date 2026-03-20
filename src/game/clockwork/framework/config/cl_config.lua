@@ -97,3 +97,4 @@ Clockwork.config:AddToSystem("MaxCharName", "max_char_name", "MaxCharNameDesc", 
 Clockwork.config:AddToSystem("CraftingDescription", "description_crafting", "CraftingDescriptionDesc")
 Clockwork.config:AddToSystem("CraftingEnabled", "crafting_menu_enabled", "CraftingEnabledDesc")
 Clockwork.config:AddToSystem("EnableVCs", "enable_voice_commands", "EnableVCsDesc")
+Clockwork.config:AddToSystem('EnableSmoothSprint', "smooth_sprint_enabled", "EnableSmoothSprintDesc")

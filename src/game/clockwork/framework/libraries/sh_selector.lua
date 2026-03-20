@@ -10,9 +10,11 @@ local surface = surface
 local timer = timer
 local draw = draw
 
-if not netstream then
-	include("clockwork/framework/libraries/sh_netstream.lua")
-end
+-- у клокворка настолько нищая система инклюда, что приходится так делать
+-- в честь этого я в инклюд добавлю order-загрузку, а то развели тут хуйню
+-- if not netstream then
+-- 	include("clockwork/framework/libraries/sh_netstream.lua")
+-- end
 
 Clockwork.selector = Clockwork.kernel:NewLibrary("Selector")
 Clockwork.selector.COLOR_ORANGE = Color(215, 150, 50, 255)

@@ -9,11 +9,25 @@ local string = string
 local util = util
 local os = os
 
+mwinv = mwinv or {}
+
 Clockwork.item = Clockwork.kernel:NewLibrary("Item")
 Clockwork.item.stored = Clockwork.item.stored or {}
+function mwinv.getStored()
+	return Clockwork.item.stored
+end
 Clockwork.item.buffer = Clockwork.item.buffer or {}
+function mwinv.getBuffer()
+	return Clockwork.item.buffer
+end
 Clockwork.item.weapons = Clockwork.item.weapons or {}
+function mwinv.getWeapons()
+	return Clockwork.item.weapons
+end
 Clockwork.item.instances = Clockwork.item.instances or {}
+function mwinv.getInstances()
+	return Clockwork.item.instances
+end
 
 --[[
 	Begin defining the item class base for other item's to inherit from.
@@ -68,9 +82,16 @@ function CLASS_TABLE:__call(varName, failSafe)
 	return self[varName] ~= nil and self[varName] or failSafe
 end
 
+-- мне так удобнее
+function mwinv.getItemData(item, field, default)
+	if not item then return default end
+	if getmetatable(item) ~= CLASS_TABLE then return default end
+	return item(field, default)
+end
+
 -- Called when the item is converted to a string.
 function CLASS_TABLE:__tostring()
-	return "ITEM[" .. self("itemID") .. "]"
+	return "ITEM [" .. self("itemID") .. "][" .. mwinv.getItemData(self, "uniqueID", "unknown_item") .. "]"
 end
 
 --[[

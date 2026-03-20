@@ -417,6 +417,13 @@ netstream.Hook("Notification", function(data)
 	end
 end)
 
+netstream.Hook('RefreshMenu', function()
+	if not Clockwork.menu:GetOpen() then return end
+	local panel = Clockwork.menu:GetPanel()
+	if not (panel and IsValid(panel)) then return end
+	panel:Rebuild()
+end)
+
 --[[
 	@codebase Client
 	@details Called to display a HUD notification when a weapon has been picked up. (Used to override GMOD function)
@@ -777,7 +784,6 @@ function Clockwork:Initialize()
 	CW_CONVAR_VIGNETTE = cwKernel:CreateClientConVar("cwShowVignette", 0, true, true)
 	CW_CONVAR_CROSSHAIR = cwKernel:CreateClientConVar("cwShowCrosshair", 1, true, true)
 	CW_CONVAR_CROSSHAIRDYNAMIC = cwKernel:CreateClientConVar("cwShowCrosshairDynamic", 0, true, true)
-	CW_CONVAR_ESPTIME = cwKernel:CreateClientConVar("cwESPTime", 1, true, true)
 	CW_CONVAR_ADMINESP = cwKernel:CreateClientConVar("cwAdminESP", 0, true, true)
 	CW_CONVAR_ESPBARS = cwKernel:CreateClientConVar("cwESPBars", 1, true, true)
 	CW_CONVAR_ITEMESP = cwKernel:CreateClientConVar("cwItemESP", 0, false, true)
@@ -838,7 +844,7 @@ function Clockwork:ClockworkInitialized()
 	end
 	
 	local weapon = weapons.GetStored("gmod_tool")
-	local logoFile = "ug_clockwork/logo/002.png"
+	local logoFile = "clockwork/logo/002.png"
 
 	-- Capitalize tool gun text on weapon scroll.
 	if (weapon) then
@@ -2251,7 +2257,7 @@ function Clockwork:HUDDrawTargetID()
 						if cwClient:GetShootPos():Distance(trace.HitPos) <= fadeDistance then
 							local active = nil
 
-							for k, v in pairs(_player.GetAll()) do
+							for k, v in ipairs(_player.GetAll()) do
 								if v:GetActiveWeapon() == trace.Entity then
 									active = true
 								end
@@ -2374,7 +2380,7 @@ end
     @param {Table} The current table of ESP positions/colors/names to add on to.
 --]]
 function Clockwork:GetAdminESPInfo(info)
-	for k, v in pairs(_player.GetAll()) do
+	for k, v in ipairs(_player.GetAll()) do
 		if v:HasInitialized() then
 			local physBone = v:LookupBone("ValveBiped.Bip01_Head1")
 			local position = nil
@@ -2410,7 +2416,7 @@ function Clockwork:GetAdminESPInfo(info)
 	end
 
 	if CW_CONVAR_SALEESP:GetInt() == 1 then
-		for k, v in pairs(ents.GetAll()) do
+		for k, v in ipairs(ents.GetAll()) do
 			if v:GetClass() == "cw_salesman" then
 				if v:IsValid() then
 					local position = v:GetPos() + Vector(0, 0, 80)
@@ -2436,7 +2442,7 @@ function Clockwork:GetAdminESPInfo(info)
 	end
 
 	if CW_CONVAR_ITEMESP:GetInt() == 1 then
-		for k, v in pairs(ents.GetAll()) do
+		for k, v in ipairs(ents.GetAll()) do
 			if v:GetClass() == "cw_item" then
 				if v:IsValid() then
 					local position = v:GetPos()
@@ -3111,13 +3117,11 @@ function Clockwork:RenderScreenspaceEffects()
 		local isDrunk = cwPly:GetDrunk()
 
 		if not cwKernel:IsChoosingCharacter() then
-			if cwLimb:IsActive() and cwEvent:CanRun("blur", "limb_damage") then
+			if cwLimb:IsActive() then
 				local headDamage = cwLimb:GetDamage(HITGROUP_HEAD)
 				motionBlurs.blurTable["health"] = math.Clamp(1 - headDamage * 0.01, 0, 1)
 			elseif cwClient:Health() <= 25 then
-				if cwEvent:CanRun("blur", "health") then
-					motionBlurs.blurTable["health"] = math.Clamp(1 - (cwClient:GetMaxHealth() - cwClient:Health()) * 0.01, 0, 1)
-				end
+				motionBlurs.blurTable["health"] = math.Clamp(1 - (cwClient:GetMaxHealth() - cwClient:Health()) * 0.01, 0, 1)
 			end
 
 			if cwClient:Alive() then
@@ -3126,16 +3130,14 @@ function Clockwork:RenderScreenspaceEffects()
 				color = 0
 			end
 
-			if cwEvent:CanRun("blur", "isDrunk") then
-				if isDrunk and self.DrunkBlur then
-					self.DrunkBlur = math.Clamp(self.DrunkBlur - frameTime / 10, math.max(1 - isDrunk / 8, 0.1), 1)
-					DrawMotionBlur(self.DrunkBlur, 1, 0)
-				elseif self.DrunkBlur and self.DrunkBlur < 1 then
-					self.DrunkBlur = math.Clamp(self.DrunkBlur + frameTime / 10, 0.1, 1)
-					motionBlurs.blurTable["isDrunk"] = self.DrunkBlur
-				else
-					self.DrunkBlur = 1
-				end
+			if isDrunk and self.DrunkBlur then
+				self.DrunkBlur = math.Clamp(self.DrunkBlur - frameTime / 10, math.max(1 - isDrunk / 8, 0.1), 1)
+				DrawMotionBlur(self.DrunkBlur, 1, 0)
+			elseif self.DrunkBlur and self.DrunkBlur < 1 then
+				self.DrunkBlur = math.Clamp(self.DrunkBlur + frameTime / 10, 0.1, 1)
+				motionBlurs.blurTable["isDrunk"] = self.DrunkBlur
+			else
+				self.DrunkBlur = 1
 			end
 		end
 
@@ -3721,7 +3723,7 @@ end
 --]]
 function Clockwork:HUDPaint()
 	if not cwKernel:IsChoosingCharacter() and not cwKernel:IsUsingCamera() then
-		if cwEvent:CanRun("view", "damage") and cwClient:Alive() then
+		if cwClient:Alive() then
 			local health = cwClient:Health()
 			local maxHealth = cwClient:GetMaxHealth() * 0.5
 
@@ -3730,7 +3732,7 @@ function Clockwork:HUDPaint()
 			end
 		end
 
-		if cwEvent:CanRun("view", "vignette") and cwConfig:Get("enable_vignette"):Get() then
+		if cwConfig:Get("enable_vignette"):Get() then
 			cwPlugin:Call("DrawPlayerVignette")
 		end
 
@@ -3738,7 +3740,7 @@ function Clockwork:HUDPaint()
 		self.BaseClass:HUDPaint()
 
 		if not cwKernel:IsScreenFadedBlack() then
-			for k, v in pairs(_player.GetAll()) do
+			for k, v in ipairs(_player.GetAll()) do
 				if v:HasInitialized() and v ~= cwClient then
 					cwPlugin:Call("HUDPaintPlayer", v)
 				end
