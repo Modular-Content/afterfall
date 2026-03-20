@@ -239,7 +239,8 @@ else
 				end
 
 				if not configObject("isStatic") then
-					value = configObject:Set(data.default and configObject:GetDefault() or data.value, useMap)
+					local val = data.default and {configObject:GetDefault()} or {data.value}
+					value = configObject:Set(val[1], useMap)
 
 					if value ~= nil then
 						local printValue = tostring(value)
