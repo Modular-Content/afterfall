@@ -1996,8 +1996,6 @@ end
 	@details Called when the Clockwork schema has loaded.
 --]]
 function Clockwork:ClockworkSchemaLoaded()
-	FACTION_CITIZENS_FEMALE = Schema:GetFemaleCitizenModels() or FACTION_CITIZENS_FEMALE
-	FACTION_CITIZENS_MALE = Schema:GetMaleCitizenModels() or FACTION_CITIZENS_MALE
 end
 
 --[[

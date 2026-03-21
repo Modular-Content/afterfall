@@ -68,13 +68,13 @@ end
 --]]
 function Clockwork.faction:Register(data, name)
 	if data.models then
-		data.models.female = data.models.female or FACTION_CITIZENS_FEMALE
-		data.models.male = data.models.male or FACTION_CITIZENS_MALE
+		data.models.female = data.models.female or (Schema.GetFemaleCitizenModels and Schema:GetFemaleCitizenModels()) or FACTION_CITIZENS_FEMALE
+		data.models.male = data.models.male or (Schema.GetMaleCitizenModels and Schema:GetMaleCitizenModels()) or FACTION_CITIZENS_MALE
 		data.allowSkins = data.allowSkins or false
 	else
 		data.models = {
-			female = FACTION_CITIZENS_FEMALE,
-			male = FACTION_CITIZENS_MALE
+			female = (Schema.GetFemaleCitizenModels and Schema:GetFemaleCitizenModels()) or FACTION_CITIZENS_FEMALE,
+			male = (Schema.GetMaleCitizenModels and Schema:GetMaleCitizenModels()) or FACTION_CITIZENS_MALE
 		}
 		data.allowSkins = true
 	end
