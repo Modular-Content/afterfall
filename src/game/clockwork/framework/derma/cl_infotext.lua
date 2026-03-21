@@ -1,4 +1,4 @@
-local Clockwork = Clockwork
+local ClockworkLite = ClockworkLite
 local Color = Color
 local derma = derma
 local vgui = vgui
@@ -8,57 +8,43 @@ local PANEL = {}
 -- Called when the panel is initialized.
 function PANEL:Init()
 	self:SetPos(4, 4)
-	self:SetSize(self:GetWide() - 8, 32)
+	self:SetSize(self:GetWide() - 8, 24)
 	self:SetBackgroundColor(Color(139, 174, 179, 255))
-	self.icon = vgui.Create("DImage", self)
-	self.icon:SetImage("icon16/comment.png")
-	self.icon:SizeToContents()
-	local font = Clockwork.fonts:GetSize(Clockwork.option:GetFont("info_text_font"), 16)
-	self.label = vgui.Create("DLabel", self)
-	self.label:SetText("")
-	self.label:SetFont(font)
-	self.label:SetTextColor(Clockwork.option:GetColor("white"))
-	self.label:SetExpensiveShadow(1, Color(0, 0, 0, 150))
-	Clockwork.kernel:CreateMarkupToolTip(self)
+	self.icon = vgui.Create('DImage', self) self.icon:SetImage('icon16/comment.png') self.icon:SizeToContents()
+	self.label = vgui.Create('DLabel', self) self.label:SetText('') self.label:SetTextColor(ClockworkLite.option:GetColor('white')) self.label:SetExpensiveShadow(1, Color(0, 0, 0, 150))
 end
 
 -- Called when the layout should be performed.
 function PANEL:PerformLayout(w, h)
+	self.icon:SetPos(4, 4)
 	if self.textToLeft then
 		if self.icon:IsVisible() then
-			self.label:SetPos(self.icon.x + self.icon:GetWide() + 12, h / 2 - self.label:GetTall() / 2)
+			self.label:SetPos(self.icon.x + 8, h / 2 - self.label:GetTall() / 2)
 		else
 			self.label:SetPos(8, h / 2 - self.label:GetTall() / 2)
 		end
 	else
 		self.label:SetPos(w / 2 - self.label:GetWide() / 2, h / 2 - self.label:GetTall() / 2)
 	end
-
-	self:UpdateIconPosition()
-	derma.SkinHook("Layout", "Panel", self)
+	derma.SkinHook('Layout', 'Panel', self)
 end
 
 -- Called when the panel is painted.
-function PANEL:Paint(w, h)
+function PANEL:Paint()
 	if self:GetPaintBackground() then
 		local width, height = self:GetSize()
 		local x, y = 0, 0
-
 		if self:IsDepressed() then
-			height = height - 2
-			width = width - 2
-			x = x + 1
-			y = y + 1
+			height = height - 4
+			width = width - 4
+			x = x + 2
+			y = y + 2
 		end
-
-		INFOTEXT_SLICED:Draw(x, y, width, height, 8, self:GetBackgroundColor())
-
+		ClockworkLite.kernel:DrawSimpleGradientBox(4, x, y, width, height, self:GetBackgroundColor())
 		if self:IsButton() and self:IsHovered() then
-			surface.SetDrawColor(255, 255, 255, 50)
-			surface.DrawRect(x, y, width, height)
+			ClockworkLite.kernel:DrawSimpleGradientBox(4, x, y, width, height, Color(255, 255, 255, 50))
 		end
 	end
-
 	return true
 end
 
@@ -71,7 +57,6 @@ end
 function PANEL:SetText(text)
 	self.label:SetText(text)
 	self.label:SizeToContents()
-	self:UpdateIconPosition()
 end
 
 -- A function to set whether the panel is a button.
@@ -110,7 +95,7 @@ function PANEL:SetTextColor(color)
 end
 
 -- Called when the mouse is pressed on the panel.
-function PANEL:OnMousePressed(mouseCode)
+function PANEL:OnMousePressed()
 	if self:IsButton() then
 		self:SetDepressed(true)
 		self:MouseCapture(true)
@@ -118,14 +103,14 @@ function PANEL:OnMousePressed(mouseCode)
 end
 
 -- Called when the mouse is released on the panel.
-function PANEL:OnMouseReleased(mouseCode)
+function PANEL:OnMouseReleased()
 	if self:IsButton() and self:IsDepressed() and self:IsHovered() then
 		if self.DoClick then
-			Clockwork.option:PlaySound("click")
+			ClockworkLite.option:PlaySound('click')
 			self:DoClick()
 		end
 	end
-
+	
 	self:SetDepressed(false)
 	self:MouseCapture(false)
 end
@@ -146,46 +131,30 @@ function PANEL:SetShowIcon(showIcon)
 end
 
 -- A function to set the icon.
-function PANEL:SetIcon(icon, size)
-	if not size then
-		size = Clockwork.option:GetKey("info_text_icon_size")
-	end
-
+function PANEL:SetIcon(icon)
 	self.icon:SetImage(icon)
+	self.icon:SizeToContents()
 	self.icon:SetVisible(true)
-	self.icon:SetSize(size, size)
-	self:UpdateIconPosition()
-end
-
--- Update the icon position to align with the text.
-function PANEL:UpdateIconPosition()
-	local size = self.icon:GetWide()
-
-	if not self.textToLeft then
-		self.icon:SetPos(self.label.x - size - 12, 16 - size / 2)
-	else
-		self.icon:SetPos(8, 16 - size / 2)
-	end
 end
 
 -- A function to set the panel's info color.
 function PANEL:SetInfoColor(color)
-	if color == "red" then
+	if color == 'red' then
 		self:SetBackgroundColor(Color(179, 46, 49, 255))
-		self:SetIcon(Clockwork.option:GetKey("info_text_red_icon"))
-	elseif color == "orange" then
+		self:SetIcon('icon16/exclamation.png')
+	elseif color == 'orange' then
 		self:SetBackgroundColor(Color(223, 154, 72, 255))
-		self:SetIcon(Clockwork.option:GetKey("info_text_orange_icon"))
-	elseif color == "green" then
+		self:SetIcon('icon16/error.png')
+	elseif color == 'green' then
 		self:SetBackgroundColor(Color(139, 215, 113, 255))
-		self:SetIcon(Clockwork.option:GetKey("info_text_green_icon"))
-	elseif color == "blue" then
+		self:SetIcon('icon16/tick.png')
+	elseif color == 'blue' then
 		self:SetBackgroundColor(Color(139, 174, 179, 255))
-		self:SetIcon(Clockwork.option:GetKey("info_text_blue_icon"))
+		self:SetIcon('icon16/information.png')
 	else
 		self:SetShowIcon(false)
 		self:SetBackgroundColor(color)
 	end
 end
 
-vgui.Register("cwInfoText", PANEL, "DPanel")
+vgui.Register('cwInfoText', PANEL, 'DPanel')

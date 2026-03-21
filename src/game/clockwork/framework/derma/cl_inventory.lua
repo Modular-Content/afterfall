@@ -13,14 +13,18 @@ local PANEL = {}
 function PANEL:Init()
 	self:SetSize(Clockwork.menu:GetWidth(), Clockwork.menu:GetHeight())
 	self.inventoryList = vgui.Create("cwPanelList", self)
-	self.inventoryList:SetPadding(8)
-	self.inventoryList:SetSpacing(8)
+	self.inventoryList:SetPadding(2)
+ 	self.inventoryList:SetSpacing(2)
+	self.inventoryList:SizeToContents()
+	self.inventoryList:EnableVerticalScrollbar()
 
 	self.equipmentList = vgui.Create("cwPanelList", self)
-	self.equipmentList:SetPadding(8)
-	self.equipmentList:SetSpacing(8)
+	self.equipmentList:SetPadding(2)
+ 	self.equipmentList:SetSpacing(2)
+	self.equipmentList:SizeToContents()
+	self.equipmentList:EnableVerticalScrollbar()
 
-	self.columnSheet = vgui.Create("cwColumnSheet", self)
+	self.columnSheet = vgui.Create("DColumnSheet", self)
 	self.columnSheet.Navigation:SetWidth(150)
 
 	self.columnSheet:AddSheet(Clockwork.option:Translate("name_inventory"), self.inventoryList, "icon16/box.png")
@@ -32,7 +36,7 @@ end
 
 -- Called to by the menu to get the width of the panel.
 function PANEL:GetMenuWidth()
-	return ScrW() * 0.5
+	return ScrW() * 0.6
 end
 
 -- A function to handle unequipping for the panel.

@@ -38,6 +38,12 @@
 
 -- КЛОКВОРКЛАЙТ СТАРЫЕ ЗАПИСИ
 -- аудирование в хуй
+
+--[[
+	© 2026 Modular Content do not share, re-distribute or modify
+	without permission of its author (admin@modularcontent.dev).
+--]]
+
 local sT,mC,r=os.clock(),Color(0,255,100),ClockworkLite and true
 MsgC(mC, r and '[ClockworkLite] Change detected! Refreshing...\n' or '[ClockworkLite] Framework is initializing...\n')
 if not r then require 'cwutil' end

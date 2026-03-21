@@ -32,6 +32,9 @@ function Clockwork.chatBox:Add(listeners, speaker, class, text, data)
 
 	Clockwork.plugin:Call("ChatBoxAdjustInfo", info)
 	Clockwork.plugin:Call("ChatBoxMessageAdded", info)
+	if info.speaker and IsValid(info.speaker) and info.speaker:IsPlayer() then
+		info.text = Clockwork.plugin:Call('AddSpeakerMarks', info.speaker, info.text, info.class) or info.text
+	end
 
 	if info.bShouldSend then
 		if IsValid(info.speaker) then

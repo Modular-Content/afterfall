@@ -9,7 +9,9 @@ function PANEL:Init()
 	self:SetSize(Clockwork.menu:GetWidth(), Clockwork.menu:GetHeight())
 	self.panelList = vgui.Create("cwPanelList", self)
 	self.panelList:SetPadding(4)
-	self.panelList:StretchToParent(4, 4, 4, 4)
+	self.panelList:SetSpacing(2)
+	self.panelList:SizeToContents()
+	self.panelList:EnableVerticalScrollbar()
 
 	Clockwork.system.panel = self
 
@@ -118,6 +120,8 @@ end
 
 -- Called when the layout should be performed.
 function PANEL:PerformLayout(w, h)
+	self.panelList:StretchToParent(4, 28, 4, 4)
+	self:SetSize(w, math.min(self.panelList.pnlCanvas:GetTall() + 32, ScrH() * 0.75))
 end
 
 --self.panelList:StretchToParent(4, 4, 4, 4);

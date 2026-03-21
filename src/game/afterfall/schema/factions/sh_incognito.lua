@@ -6,9 +6,11 @@
 local ClockworkLite = ClockworkLite
 local cwlFaction = ClockworkLite.faction
 
-local FACTION = cwlFaction:New(FACTION_CITIZEN)
+local FACTION = cwlFaction:New(FACTION_OTA)
 FACTION.useFullName = false
+FACTION.maximumAttributePoints = 700
+FACTION.whitelist = true
 FACTION.material = ''
-FACTION.team = 1
-FACTION.color = Color(150, 125, 100)
+FACTION.team = 2
+FACTION.color = Color(255, 0, 0)
 FACTION:Register()

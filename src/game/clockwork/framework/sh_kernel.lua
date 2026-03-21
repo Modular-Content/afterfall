@@ -1044,7 +1044,7 @@ if SERVER then
 	--]]
 	function Clockwork.kernel:RestoreClockworkData(fileName, failSafe)
 		if self:ClockworkDataExists(fileName) then
-			local data = Clockwork.file:Read("data/clockwork/data" .. fileName .. ".txt")
+			local data = Clockwork.file:Read("data/clockwork/data/" .. fileName .. ".txt")
 
 			if data then
 				local wasSuccess, value = xpcall(util.JSONToTable, debug.traceback, data)
@@ -1106,7 +1106,7 @@ if SERVER then
 			return
 		end
 
-		return Clockwork.file:Write("data/clockwork/data" .. fileName .. ".txt", self:Serialize(data))
+		return Clockwork.file:Write("data/clockwork/data/" .. fileName .. ".txt", self:Serialize(data))
 	end
 
 	--[[

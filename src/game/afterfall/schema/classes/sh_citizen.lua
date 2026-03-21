@@ -3,11 +3,11 @@
 	without permission of its author (admin@modularcontent.dev).
 --]]
 
-local Clockwork = Clockwork
-local cwClass = Clockwork.class
+local ClockworkLite = ClockworkLite
+local cwlClass = ClockworkLite.class
 local Color = Color
 
-local CLASS = cwClass:New('Гражданин')
+local CLASS = cwlClass:New('Гражданин')
 CLASS.color = Color(150, 125, 100)
 CLASS.ownFaction = FACTION_CITIZEN
 CLASS.isDefault = true

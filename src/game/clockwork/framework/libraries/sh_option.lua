@@ -52,13 +52,7 @@ function Clockwork.option:PlaySound(name)
 	if not sound then return end
 
 	if CLIENT then
-		local faction = Clockwork.Client:GetFaction()
-		local soundCombine = self:GetSound(name .. "Combine")
-		if ((faction == FACTION_MPF or faction == FACTION_OTA) and (soundCombine)) then
-			surface.PlaySound(soundCombine)
-		else
-			surface.PlaySound(sound)
-		end
+		surface.PlaySound(sound)
 	else
 		Clockwork.player:PlaySound(nil, sound)
 	end
@@ -84,7 +78,6 @@ Clockwork.option:SetKey("description_directory", "MenuDescDirectory")
 Clockwork.option:SetKey("description_system", "MenuDescSystem")
 Clockwork.option:SetKey("description_scoreboard", "MenuDescScoreboard")
 Clockwork.option:SetKey("description_attributes", "MenuDescAttributes")
-Clockwork.option:SetKey("description_crafting", "MenuDescCrafting")
 Clockwork.option:SetKey("description_settings", "MenuDescSettings")
 Clockwork.option:SetKey("description_donations", "MenuDescDonations")
 Clockwork.option:SetKey("description_classes", "MenuDescClasses")
@@ -101,7 +94,6 @@ Clockwork.option:SetKey("name_scoreboard", "MenuNameScoreboard")
 Clockwork.option:SetKey("name_directory", "MenuNameDirectory")
 Clockwork.option:SetKey("name_inventory", "MenuNameInventory")
 Clockwork.option:SetKey("name_business", "Business")
-Clockwork.option:SetKey("name_crafting", "MenuNameCrafting")
 Clockwork.option:SetKey("name_donations", "MenuNameDonations")
 Clockwork.option:SetKey("name_settings", "MenuNameSettings")
 Clockwork.option:SetKey("name_classes", "MenuNameClasses")
@@ -113,7 +105,6 @@ Clockwork.option:SetKey("intro_sound", "music/HL2_song25_Teleporter.mp3")
 Clockwork.option:SetKey("menu_music", "music/hl2_song32.mp3")
 Clockwork.option:SetKey("top_bars", false)
 Clockwork.option:SetKey("gradient", "gui/gradient_up")
-Clockwork.option:SetKey("crafting_menu_enabled", true)
 Clockwork.option:SetSound("click_release", "ui/buttonclickrelease.wav")
 Clockwork.option:SetSound("rollover", "ui/buttonrollover.wav")
 Clockwork.option:SetSound("click", "ui/buttonclick.wav")
@@ -200,11 +191,6 @@ if CLIENT then
 	})
 
 	Clockwork.option:SetKey("icon_data_business", {
-		path = "",
-		size = nil
-	})
-
-	Clockwork.option:SetKey("icon_data_crafting", {
 		path = "",
 		size = nil
 	})

@@ -152,11 +152,6 @@ function THEME:Initialize()
 		size = nil
 	})
 
-	Clockwork.option:SetKey("icon_data_crafting", {
-		path = "",
-		size = nil
-	})
-
 	Clockwork.option:SetKey("top_bar_width_scale", 0.3)
 	Clockwork.option:SetKey("info_text_icon_size", 20)
 	Clockwork.option:SetKey("info_text_red_icon", "icon16/exclamation.png")
@@ -210,10 +205,6 @@ function THEME:Initialize()
 	Clockwork.option:SetSound("rollover", "ui/buttonrollover.wav")
 	Clockwork.option:SetSound("click", "ui/buttonclick.wav")
 	Clockwork.option:SetSound("tick", "common/talk.wav")
-
-	Clockwork.option:SetSound("clickCombine", "ug/ui/buttonrolloverez2.wav")
-	Clockwork.option:SetSound("click_releaseCombine", "ug/ui/buttonclickreleaseez2.wav")
-	Clockwork.option:SetSound("rolloverCombine", "ug/ui/buttonrolloverez2.wav")
 
 	SMALL_BAR_BG = Clockwork.render:AddSlice9("SimpleTint", "clockwork/sliced/simpletint", 6)
 	SMALL_BAR_FG = Clockwork.render:AddSlice9("SimpleTint", "clockwork/sliced/simpletint", 6)

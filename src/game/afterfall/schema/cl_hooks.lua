@@ -7,6 +7,24 @@ local ClockworkLite = ClockworkLite
 local cwlKernel = ClockworkLite.kernel
 local cwlConfig = ClockworkLite.config
 
+function Schema:RenderScreenspaceEffects()
+	if not cwlKernel:IsScreenFadedBlack() then
+		local ply = ClockworkLite.Client
+		if not IsValid(ply) then return end
+		local faction = ply:GetFaction()
+		if ply:IsCombine() and ply:IsMasked() and faction ~= FACTION_INCOG then
+			render.UpdateScreenEffectTexture()
+			self.combineOverlay:SetFloat('$refractamount', 0.3)
+			self.combineOverlay:SetFloat('$envmaptint', 0)
+			self.combineOverlay:SetFloat('$envmap', 0)
+			self.combineOverlay:SetFloat('$alpha', 0.5)
+			self.combineOverlay:SetInt('$ignorez', 1)
+			render.SetMaterial(self.combineOverlay)
+			render.DrawScreenQuad()
+		end
+	end
+end
+
 function Schema:GetCinematicIntroInfo()
 	local smallText = cwlConfig:Get('intro_text_small'):Get()
 	if smallText:find '%%d' then smallText = smallText:format(os.date('%Y')) end
@@ -14,6 +32,9 @@ function Schema:GetCinematicIntroInfo()
 end
 
 local scoreboardClasses = {
+	[FACTION_MPF] = FACTION_MPF,
+	[FACTION_OTA] = FACTION_OTA,
+	[FACTION_CREMATOR] = 'Синтеты',
 	[FACTION_CITIZEN] = 'Граждане',
 }
 

@@ -1342,23 +1342,12 @@ end
 	@returns {Unknown}
 --]]
 function Clockwork:MenuItemsAdd(menuItems)
-
 	menuItems:Add(cwOption:Translate("name_attributes"), "cwAttributes", cwOption:Translate("description_attributes"), cwOption:GetKey("icon_data_attributes"))
 	menuItems:Add(cwOption:Translate("name_scoreboard"), "cwScoreboard", cwOption:Translate("description_scoreboard"), cwOption:GetKey("icon_data_scoreboard"))
 	menuItems:Add(cwOption:Translate("name_inventory"), "cwInventory", cwOption:Translate("description_inventory"), cwOption:GetKey("icon_data_inventory"))
 	menuItems:Add(cwOption:Translate("name_directory"), "cwDirectory", cwOption:Translate("description_directory"), cwOption:GetKey("icon_data_directory"))
 	menuItems:Add(cwOption:Translate("name_settings"), "cwSettings", cwOption:Translate("description_settings"), cwOption:GetKey("icon_data_settings"))
 	menuItems:Add(cwOption:Translate("name_system"), "cwSystem", cwOption:Translate("description_system"), cwOption:GetKey("icon_data_system"))
-
-	menuItems:Add(cwOption:Translate("name_donations"), "cwDonations", cwOption:Translate("description_donations"), cwOption:GetKey("icon_data_donations"))
-
-	if cwConfig:Get("show_business"):GetBoolean() then
-		menuItems:Add(cwOption:Translate("name_business"), "cwBusiness", cwOption:Translate("description_business"), cwOption:GetKey("icon_data_business"))
-	end
-
-	if cwConfig:Get("crafting_menu_enabled"):GetBoolean() then
-		menuItems:Add(cwOption:Translate("name_crafting"), "cwCrafting", cwOption:Translate("description_crafting"), cwOption:GetKey("icon_data_crafting"))
-	end
 end
 
 --[[

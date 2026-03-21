@@ -1532,7 +1532,7 @@ function PANEL:Init()
 	local panel = Clockwork.character:GetPanel()
 
 	self.categoryList = vgui.Create("DCategoryList", self)
-	self.categoryList:SetPadding(4)
+	self.categoryList:SetPadding(2)
 	self.categoryList:SizeToContents()
 
 	self.overrideModel = nil
@@ -1561,9 +1561,9 @@ function PANEL:Init()
 		end
 	end
 
+	self.nameForm = vgui.Create("DForm", self)
+	self.nameForm:SetPadding(4)
 	if not Clockwork.faction.stored[self.info.faction].GetName then
-		self.nameForm = vgui.Create("DForm", self)
-		self.nameForm:SetPadding(2)
 		self.nameForm:SetLabel(L("Name"))
 
 		if Clockwork.faction.stored[self.info.faction].useFullName then
@@ -1575,6 +1575,8 @@ function PANEL:Init()
 			self.surnameTextEntry = self.nameForm:TextEntry(L("CharacterMenuSurname"))
 			self.surnameTextEntry:SetAllowNonAsciiCharacters(true)
 		end
+	else
+		self.nameForm:SetLabel(L("CharacterVoice"))
 	end
 
 	if self.hasSelectedModel or self.hasPhysDesc then
@@ -1620,7 +1622,8 @@ function PANEL:Init()
 	checkButton:SetSize(100, 20)
 	function checkButton.DoClick()
 		if Clockwork.faction.stored[self.info.faction].voPreview then
-			Clockwork.faction.stored[self.info.faction].voPreview(lowerGender, self.multitoneNumSlider:GetValue())
+			local res = Clockwork.faction.stored[self.info.faction].voPreview(lowerGender)
+			Clockwork.Client:EmitSound(res, 75, 100 + self.multitoneNumSlider:GetValue())
 		else
 			Clockwork.Client:EmitSound('vo/npc/' .. lowerGender .. '01/question' .. math.random(10, 31) .. '.wav', 75, 100 + self.multitoneNumSlider:GetValue())
 		end

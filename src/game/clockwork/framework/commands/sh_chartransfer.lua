@@ -35,14 +35,29 @@ function COMMAND:OnRun(player, arguments)
 				return
 			end
 
+			local wasSuccess, fault
 			if not Clockwork.faction.stored[faction].OnTransferred then
+				if Clockwork.faction.stored[faction].TransferData then
+					local gender = target:GetGender()
+					local res = Clockwork.faction.stored[faction]:TransferData(faction, name, gender)
+					if res then
+						ClockworkLite.player:SetName(target, res.name)
+						target:SetCharacterData('model', res.model, true)
+						target:SetModel(res.model)
+					end
+					wasSuccess, fault = true, nil
+					goto transferDone
+				end
 				Clockwork.player:Notify(player, {"PlayerCannotTransferToFaction", target:Name(), faction})
 
 				return
 			end
 
-			local wasSuccess, fault = Clockwork.faction.stored[faction]:OnTransferred(target, Clockwork.faction.stored[targetFaction], arguments[3])
+			if not wasSuccess then
+				wasSuccess, fault = Clockwork.faction.stored[faction]:OnTransferred(target, Clockwork.faction.stored[targetFaction], arguments[3])
+			end
 
+			::transferDone::
 			if wasSuccess ~= false then
 				target:SetCharacterData("Faction", faction, true)
 				Clockwork.player:LoadCharacter(target, Clockwork.player:GetCharacterID(target))

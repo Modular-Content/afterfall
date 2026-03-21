@@ -1705,12 +1705,7 @@ end
 	@param {Unknown} Missing description for player.
 	@returns {Unknown}
 --]]
-function Clockwork:PlayerDataLoaded(player)
-	if cwConfig:Get("clockwork_intro_enabled"):Get() then
-			netstream.Start(player, "ClockworkIntro", true)
-		end
-			netstream.Start(player, "Donations", player.cwDonations)
-	end
+function Clockwork:PlayerDataLoaded(player) end
 
 --[[
 	@codebase Server

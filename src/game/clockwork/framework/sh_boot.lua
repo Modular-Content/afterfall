@@ -12,6 +12,7 @@
 -- 	CurrentGM = nil
 -- end
 mw = mw or {}
+CFG = CFG or {}
 
 Clockwork.ClockworkFolder = Clockwork.ClockworkFolder or GM.Folder
 Clockwork.SchemaFolder = Clockwork.SchemaFolder or engine.ActiveGamemode()

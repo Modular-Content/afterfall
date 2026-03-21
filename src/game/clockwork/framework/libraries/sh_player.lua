@@ -4902,19 +4902,11 @@ else -- if (SERVER) then
 				player.cwLastPlayed = tonumber(result[1]._LastPlayed)
 				player.cwUserGroup = result[1]._UserGroup
 				player.cwData = self:ConvertDataString(player, result[1]._Data)
-				local wasSuccess, value = xpcall(jsonDecode, debug.traceback, result[1]._Donations)
-
-				if wasSuccess and value ~= nil then
-					player.cwDonations = value
-				else
-					player.cwDonations = {}
-				end
 
 				onNextPlay = result[1]._OnNextPlay
 			else
 				player.cwTimeJoined = unixTime
 				player.cwLastPlayed = unixTime
-				player.cwDonations = {}
 				player.cwUserGroup = "user"
 				player.cwData = self:SaveData(player, true)
 			end
