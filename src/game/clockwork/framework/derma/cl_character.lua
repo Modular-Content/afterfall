@@ -1271,17 +1271,13 @@ function PANEL:Init()
 		maximumPoints = factionTable.maximumAttributePoints
 	end
 
-	self.attributesForm = vgui.Create("cwBasicForm")
-	self.attributesForm:SetAutoSize(true)
-	self.attributesForm:SetText(Clockwork.option:Translate("name_attributes"))
-	self.attributesForm:SetPadding(8)
-	self.attributesForm:SetSpacing(12)
+	self.attributesForm = vgui.Create("DForm")
+	self.attributesForm:SetLabel(Clockwork.option:GetKey("name_attributes"))
+	self.attributesForm:SetPadding(4)
 
-	self.categoryList = vgui.Create("cwPanelList", self)
-	self.categoryList:SetPadding(8)
-	self.categoryList:SetSpacing(8)
-	self.categoryList:SizeToContents()
-	self.categoryList:EnableVerticalScrollbar(true)
+	self.categoryList = vgui.Create("DCategoryList", self)
+ 	self.categoryList:SetPadding(2)
+ 	self.categoryList:SizeToContents()
 
 	for k, v in pairs(Clockwork.attribute:GetAll()) do
 		attributes[#attributes + 1] = v

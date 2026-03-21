@@ -97,8 +97,8 @@ if CLIENT then
 		infoText:DockMargin(0, 0, 0, 8)
 		systemPanel.panelList:AddItem(infoText)
 
-		self.colorModForm = vgui.Create("cwBasicForm", systemPanel)
-		self.colorModForm:SetText(L("Color"))
+		self.colorModForm = vgui.Create("DForm", systemPanel)
+		self.colorModForm:SetLabel(L("Color"))
 		self.colorModForm:SetPadding(8)
 		self.colorModForm:SetSpacing(8)
 		self.colorModForm:SetAutoSize(true)

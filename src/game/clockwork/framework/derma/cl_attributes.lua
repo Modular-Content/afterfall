@@ -12,10 +12,10 @@ local PANEL = {}
 function PANEL:Init()
 	self:SetSize(Clockwork.menu:GetWidth(), Clockwork.menu:GetHeight())
 	self.panelList = vgui.Create("cwPanelList", self)
-	self.panelList:SetPadding(8)
-	self.panelList:SetSpacing(8)
-	self.panelList:StretchToParent(4, 4, 4, 4)
-	self.panelList:HideBackground()
+	self.panelList:SetPadding(2)
+ 	self.panelList:SetSpacing(2)
+	self.panelList:SizeToContents()
+	self.panelList:EnableVerticalScrollbar()
 
 	Clockwork.attributes.panel = self
 	Clockwork.attributes.panel.boosts = {}
@@ -56,60 +56,65 @@ function PANEL:Rebuild()
 	table.sort(categories, function(a, b) return a.category < b.category end)
 
 	if #categories > 0 or #miscellaneous > 0 then
-		--[[ local attributeName = string.lower(Clockwork.option:GetKey("name_attribute"))
-
 		local label = vgui.Create("cwInfoText", self)
-		label:SetText("The top bar represents the points and the bottom represents progress.")
-		label:SetInfoColor("blue")
+			label:SetText("Верхняя полоса показывает количество очков, нижняя прогресс.")
+			label:SetInfoColor("blue")
 		self.panelList:AddItem(label)
 
 		local label = vgui.Create("cwInfoText", self)
-		label:SetText("A green bar means that the " .. attributeName .. " has been boosted.")
-		label:SetInfoColor("green")
-		label:SetShowIcon(false)
+			label:SetText("Зеленая полоса означает, что навык был повышен.")
+			label:SetInfoColor("green")
+			label:SetShowIcon(false)
 		self.panelList:AddItem(label)
 
 		local label = vgui.Create("cwInfoText", self)
-		label:SetText("A red bar means that the " .. attributeName .. " has been hindered.")
-		label:SetInfoColor("red")
-		label:SetShowIcon(false)
-		self.panelList:AddItem(label) ]]
+			label:SetText("Красная полоса означает, что навык был понижен.")
+			label:SetInfoColor("red")
+			label:SetShowIcon(false)
+		self.panelList:AddItem(label)
 
 		for k, v in pairs(miscellaneous) do
-			local categoryForm = vgui.Create("cwBasicForm", self)
-			categoryForm:SetPadding(0)
-			categoryForm:SetSpacing(0)
-			categoryForm:SetAutoSize(true)
-			categoryForm:SetText(v[2], nil, nil, 18)
+			local form = vgui.Create("DForm", self)
+			form:SetLabel(v[2])
+
 			self.currentAttribute = v[1]
-			categoryForm:AddItem(vgui.Create("cwAttributesItem", self))
-			self.panelList:AddItem(categoryForm)
+				form:AddItem(
+					vgui.Create("cwAttributesItem", self)
+				)
+			self.panelList:AddItem(form)
 		end
 
 		for k, v in pairs(categories) do
-			local categoryForm = vgui.Create("cwBasicForm", self)
-			categoryForm:SetPadding(0)
-			categoryForm:SetSpacing(8)
-			categoryForm:SetAutoSize(true)
-			categoryForm:SetText(v.category, nil, "basic_form_highlight", 25)
+			local categoryForm = vgui.Create("DForm", self)
 			local panelList = vgui.Create("DPanelList", self)
-			table.sort(v.attributes, function(a, b) return a[2] < b[2] end)
+
+			table.sort(v.attributes, function(a, b)
+				return a[2] < b[2]
+			end)
 
 			for k2, v2 in pairs(v.attributes) do
-				local attributeForm = vgui.Create("cwBasicForm", self)
-				attributeForm:SetPadding(0)
-				attributeForm:SetSpacing(4)
-				attributeForm:SetAutoSize(true)
-				attributeForm:SetText(v2[2], nil, nil, 18)
+				local form = vgui.Create("DForm", self)
+				form:SetLabel(v2[2])
+				form.Paint = function(panel)
+					surface.SetDrawColor(Color(180, 180, 180, 255))
+					surface.DrawRect(0, 0, panel:GetWide(), panel:GetTall())
+				end
+
 				self.currentAttribute = v2[1]
-				attributeForm:AddItem(vgui.Create("cwAttributesItem", self))
-				panelList:AddItem(attributeForm)
+					form:AddItem(
+						vgui.Create("cwAttributesItem", self)
+					)
+				panelList:AddItem(form)
 			end
 
 			panelList:SetAutoSize(true)
 			panelList:SetPadding(4)
 			panelList:SetSpacing(8)
+
+			categoryForm:SetLabel(v.category)
 			categoryForm:AddItem(panelList)
+			categoryForm:SetPadding(4)
+
 			self.panelList:AddItem(categoryForm)
 		end
 	else
@@ -136,13 +141,15 @@ end
 
 -- Called when the layout should be performed.
 function PANEL:PerformLayout(w, h)
+	self.panelList:StretchToParent(4, 28, 4, 4)
+	self:SetSize(w, math.min(self.panelList.pnlCanvas:GetTall() + 32, ScrH() * 0.75))
 end
 
---self.panelList:StretchToParent(4, 4, 4, 4);
---self:SetSize(w, math.min(self.panelList.pnlCanvas:GetTall() + 32, ScrH() * 0.75));
+--self.panelList:StretchToParent(4, 4, 4, 4)
+--self:SetSize(w, math.min(self.panelList.pnlCanvas:GetTall() + 32, ScrH() * 0.75))
 -- Called when the panel is painted.
 function PANEL:Paint(w, h)
-	DERMA_SLICED_BG:Draw(0, 0, w, h, 8, COLOR_WHITE)
+	derma.SkinHook('Paint', 'Frame', self, w, h)
 
 	return true
 end
@@ -155,11 +162,11 @@ function PANEL:Init()
 	self.attribute = Clockwork.attribute:FindByID(self:GetParent().currentAttribute)
 
 	self:SetBackgroundColor(Color(80, 70, 60, 255))
+	self:SetToolTip(self.attribute.description)
 	self:SetSize(self:GetParent():GetWide() - 8, 32)
 
-	self.baseBar = Clockwork.kernel:CreateMarkupToolTip(vgui.Create("DPanel", self))
+	self.baseBar = vgui.Create("DPanel", self)
 	self.baseBar:SetSize(self:GetWide() - 4, 20)
-	self.baseBar:SetTooltip(self.attribute.description)
 
 	self.progressBar = vgui.Create("DPanel", self)
 	self.progressBar:SetSize(self:GetWide() - 4, 8)
@@ -169,7 +176,7 @@ function PANEL:Init()
 	self.percentageText:SetTextColor(Clockwork.option:GetColor("white"))
 	self.percentageText:SetExpensiveShadow(1, Color(0, 0, 0, 150))
 	self.percentageText:SizeToContents()
-	self.percentageText:SetPos(self:GetWide() - self.percentageText:GetWide() - 16, self.baseBar.y + self.baseBar:GetTall() / 2 - self.percentageText:GetTall() / 2)
+	self.percentageText:SetPos(self:GetWide() - self.percentageText:GetWide() - 16, self.baseBar.y + (self.baseBar:GetTall() / 2) - (self.percentageText:GetTall() / 2))
 
 	-- Called when the panel should be painted.
 	function self.baseBar.Paint(baseBar)
@@ -330,7 +337,7 @@ function PANEL:SetPercentageText(maximum, default, boost)
 
 	self.percentageText:SetText(percentage .. "%")
 	self.percentageText:SizeToContents()
-	self.percentageText:SetPos(self:GetWide() - self.percentageText:GetWide() - 16, self.baseBar.y + self.baseBar:GetTall() / 2 - self.percentageText:GetTall() / 2)
+	self.percentageText:SetPos(self:GetWide() - self.percentageText:GetWide() - 16, self.baseBar.y + (self.baseBar:GetTall() / 2) - (self.percentageText:GetTall() / 2))
 end
 
 -- Called when the panel is painted.

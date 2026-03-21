@@ -13,7 +13,7 @@ if CLIENT then
 	end
 
 	-- Called when the system should be displayed.
-	function SYSTEM:OnDisplay(systemPanel, systemForm)
+	function SYSTEM:OnDisplay(systemPanel)
 		self.adminValues = nil
 
 		self.infoText = vgui.Create("cwInfoText", systemPanel)
@@ -22,20 +22,16 @@ if CLIENT then
 		self.infoText:DockMargin(0, 0, 0, 8)
 		systemPanel.panelList:AddItem(self.infoText)
 
-		self.configForm = vgui.Create("cwBasicForm", systemPanel)
-		self.configForm:SetText(L("ConfigMenuTitle"))
-		self.configForm:SetPadding(8)
-		self.configForm:SetSpacing(8)
-		self.configForm:SetAutoSize(true)
-		systemPanel.panelList:AddItem(self.configForm)
+		self.configForm = vgui.Create("DForm", systemPanel);
+			self.configForm:SetLabel("Config");
+			self.configForm:SetPadding(4);
+		systemPanel.panelList:AddItem(self.configForm);
 
-		self.editForm = vgui.Create("cwBasicForm", systemPanel)
-		self.editForm:SetText("")
-		self.editForm:SetPadding(8)
-		self.editForm:SetSpacing(8)
-		self.editForm:SetVisible(false)
-		self.editForm:SetAutoSize(true)
-		systemPanel.panelList:AddItem(self.editForm)
+		self.editForm = vgui.Create("DForm", systemPanel);
+			self.editForm:SetLabel("None");
+			self.editForm:SetPadding(4);
+			self.editForm:SetVisible(false);
+		systemPanel.panelList:AddItem(self.editForm);
 
 		if not self.activeKey then
 			netstream.Start("SystemCfgKeys", true)
@@ -43,8 +39,6 @@ if CLIENT then
 
 		self.listView = vgui.Create("DListView")
 		self.listView:AddColumn(L("ConfigMenuListName"))
-		self.listView:AddColumn(L("ConfigMenuListKey"))
-		self.listView:AddColumn(L("ConfigMenuListAddedBy"))
 		self.listView:SetMultiSelect(false)
 		self.listView:SetTall(256)
 		self:PopulateComboBox()
@@ -76,6 +70,7 @@ if CLIENT then
 
 		function self.listView.OnRowSelected(parent, lineID, line)
 			netstream.Start("SystemCfgValue", line.key)
+			timer.Simple(0, function() systemPanel.panelList:Rebuild() end)
 		end
 
 		self.configForm:AddItem(self.listView)
@@ -98,7 +93,7 @@ if CLIENT then
 				self.editForm:Help(v)
 			end
 
-			self.editForm:SetText(L(self.adminValues.name))
+			self.editForm:SetLabel(L(self.adminValues.name))
 
 			if self.activeKey.value ~= nil then
 				local mapEntry = self.editForm:TextEntry(L("ConfigMenuMapText"))

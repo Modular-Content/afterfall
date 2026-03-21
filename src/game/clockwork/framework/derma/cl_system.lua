@@ -47,7 +47,6 @@ function PANEL:Rebuild()
 				self.systemForm = vgui.Create("DForm", self)
 				self.systemForm:SetPadding(4)
 				self.systemForm:SetName(systemTable.name)
-				self.systemForm:SetTall(100)
 				self.panelList:AddItem(self.systemForm)
 			end
 
@@ -62,14 +61,11 @@ function PANEL:Rebuild()
 		for k, v in pairs(Clockwork.system:GetAll()) do
 			self.systemCategoryForm = vgui.Create("DForm", self)
 			self.systemCategoryForm:SetPadding(4)
-			self.systemCategoryForm:SetName(L(v.name))
-			self.systemCategoryForm:SetTall(100)
+			self.systemCategoryForm:SetLabel(L(v.name))
 
 			self.panelList:AddItem(self.systemCategoryForm)
 
-			local tooltip = self.systemCategoryForm:Help(L(v.toolTip))
-			tooltip:SetFont(Clockwork.fonts:GetSize(Clockwork.option:GetFont("menu_text_tiny"), 18))
-			tooltip:SetTextColor(Clockwork.option:GetColor("basic_form_color"))
+			self.systemCategoryForm:Help(L(v.toolTip))
 
 			local systemButton = vgui.Create("cwInfoText", systemPanel)
 			systemButton:SetText(L("Open"))
@@ -124,12 +120,14 @@ function PANEL:PerformLayout(w, h)
 	self:SetSize(w, math.min(self.panelList.pnlCanvas:GetTall() + 32, ScrH() * 0.75))
 end
 
---self.panelList:StretchToParent(4, 4, 4, 4);
---self:SetSize(w, math.min(self.panelList.pnlCanvas:GetTall() + 32, ScrH() * 0.75));
 -- Called when the panel is painted.
 function PANEL:Paint(w, h)
-	--DERMA_SLICED_BG:Draw(0, 0, w, h, 8, COLOR_WHITE);
+	derma.SkinHook('Paint', 'Frame', self, w, h)
 	return true
+end
+
+function PANEL:Think()
+	self:InvalidateLayout(true)
 end
 
 vgui.Register("cwSystem", PANEL, "EditablePanel")

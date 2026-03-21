@@ -64,19 +64,19 @@ function PANEL:Rebuild()
 		label:SetInfoColor("blue");
 	self.inventoryList:AddItem(label);
 	--]]
-	self.weightForm = vgui.Create("cwBasicForm", self)
+	self.weightForm = vgui.Create("DForm", self)
 	self.weightForm:SetPadding(8)
 	self.weightForm:SetSpacing(8)
 	self.weightForm:SetAutoSize(true)
-	self.weightForm:SetText(L("Weight"), nil, "basic_form_highlight")
+	self.weightForm:SetLabel(L("Weight"), nil, "basic_form_highlight")
 	self.weightForm:AddItem(vgui.Create("cwInventoryWeight", self))
 
 	if Clockwork.inventory:UseSpaceSystem() then
-		self.spaceForm = vgui.Create("cwBasicForm", self)
+		self.spaceForm = vgui.Create("DForm", self)
 		self.spaceForm:SetPadding(8)
 		self.spaceForm:SetSpacing(8)
 		self.spaceForm:SetAutoSize(true)
-		self.spaceForm:SetText(L("Space"), nil, "basic_form_highlight")
+		self.spaceForm:SetLabel(L("Space"), nil, "basic_form_highlight")
 		self.spaceForm:AddItem(vgui.Create("cwInventorySpace", self))
 	end
 
@@ -149,11 +149,11 @@ function PANEL:Rebuild()
 				collapsibleCategory:SetCookieName("Equipment"..v.category);
 			self.equipmentList:AddItem(collapsibleCategory);
 			--]]
-			local categoryForm = vgui.Create("cwBasicForm", self)
+			local categoryForm = vgui.Create("DForm", self)
 			categoryForm:SetPadding(8)
 			categoryForm:SetSpacing(8)
 			categoryForm:SetAutoSize(true)
-			categoryForm:SetText(v.category, nil, "basic_form_highlight")
+			categoryForm:SetLabel(v.category, nil, "basic_form_highlight")
 			local categoryList = vgui.Create("DPanelList", categoryForm)
 			categoryList:EnableHorizontal(true)
 			categoryList:SetAutoSize(true)
@@ -186,11 +186,11 @@ function PANEL:Rebuild()
 				collapsibleCategory:SetCookieName("Inventory"..v.category);
 			self.inventoryList:AddItem(collapsibleCategory);
 			--]]
-			local categoryForm = vgui.Create("cwBasicForm", self)
+			local categoryForm = vgui.Create("DForm", self)
 			categoryForm:SetPadding(8)
 			categoryForm:SetSpacing(8)
 			categoryForm:SetAutoSize(true)
-			categoryForm:SetText(v.category, nil, "basic_form_highlight")
+			categoryForm:SetLabel(v.category, nil, "basic_form_highlight")
 			local categoryList = vgui.Create("DPanelList", categoryForm)
 			categoryList:EnableHorizontal(true)
 			categoryList:SetAutoSize(true)

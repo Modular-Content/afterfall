@@ -15,7 +15,6 @@ function PANEL:Init()
 	self.panelList:SetPadding(8)
 	self.panelList:SetSpacing(8)
 	self.panelList:StretchToParent(4, 4, 4, 4)
-	self.panelList:HideBackground()
 
 	Clockwork.scoreboard = self
 	Clockwork.scoreboard:Rebuild()
@@ -70,11 +69,11 @@ function PANEL:Rebuild()
 				classColor = classData.color
 			end ]]
 
-			local characterForm = vgui.Create("cwBasicForm", self)
+			local characterForm = vgui.Create("DForm", self)
 			characterForm:SetPadding(8)
 			characterForm:SetSpacing(8)
 			characterForm:SetAutoSize(true)
-			characterForm:SetText(v.name, Clockwork.option:GetFont("scoreboard_class"), classColor)
+			characterForm:SetLabel(v.name, Clockwork.option:GetFont("scoreboard_class"), classColor)
 
 			local panelList = vgui.Create("DPanelList", self)
 			panelList:SetAutoSize(true)

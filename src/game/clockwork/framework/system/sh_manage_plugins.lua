@@ -51,7 +51,7 @@ if CLIENT then
 			systemPanel.panelList:AddItem(label)
 
 			for k, v in pairs(mainPlugins) do
-				local pluginForm = vgui.Create("cwBasicForm", systemPanel)
+				local pluginForm = vgui.Create("DForm", systemPanel)
 				local panelList = vgui.Create("DPanelList", systemPanel)
 
 				for k2, v2 in pairs(v.plugins) do
@@ -88,7 +88,7 @@ if CLIENT then
 				panelList:SetPadding(8)
 				panelList:SetSpacing(4)
 
-				pluginForm:SetText(v.category)
+				pluginForm:SetLabel(v.category)
 				pluginForm:AddItem(panelList)
 				pluginForm:SetPadding(8)
 				pluginForm:SetAutoSize(true)

@@ -14,7 +14,6 @@ function PANEL:Init()
 	self.panelList:SetPadding(8)
 	self.panelList:SetSpacing(8)
 	self.panelList:StretchToParent(4, 4, 4, 4)
-	self.panelList:HideBackground()
 	self.panelList:EnableVerticalScrollbar()
 	self:Rebuild()
 end
@@ -61,11 +60,11 @@ function PANEL:Rebuild()
 		self.panelList:AddItem(label)
 
 		for k, v in pairs(categories) do
-			local form = vgui.Create("cwBasicForm", self)
+			local form = vgui.Create("DForm", self)
 			form:SetPadding(8)
 			form:SetSpacing(8)
 			form:SetAutoSize(true)
-			form:SetText(L(v.category), nil, "basic_form_highlight", 25)
+			form:SetLabel(L(v.category), nil, "basic_form_highlight", 25)
 
 			for k2, v2 in pairs(v.settings) do
 				if v2.class == "numberSlider" then

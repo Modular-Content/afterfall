@@ -14,36 +14,17 @@ function PANEL:SetBackgroundColor(color)
 	self.backgroundColor = color
 end
 
-function PANEL:HideBackground()
-	self.backgroundHidden = true
-end
-
-function PANEL:SetSpacing(spacing)
-	self.defaultSpacing = spacing
-end
-
-function PANEL:EnableVerticalScrollbar()
-end
-
-function PANEL:AddItem(item, bottomMargin)
-	local padding = self:GetPadding()
-	bottomMargin = bottomMargin or self.defaultSpacing or 8
-
-	item:Dock(TOP)
-	item:DockMargin(padding, padding, padding, bottomMargin)
-
-	DCategoryList.AddItem(self, item)
-
-	self:InvalidateLayout(true)
-end
-
 -- Called when the panel should be painted.
-function PANEL:Paint(width, height)
-	if not self.backgroundHidden then
-		PANEL_LIST_SLICED:Draw(0, 0, width, height, 8, self.backgroundColor)
-	end
+function PANEL:Paint(w, h)
+	surface.SetDrawColor(self.backgroundColor)
+	surface.DrawRect(0, 0, w, h)
+	derma.SkinHook('Paint', 'cwPanelList', self, w, h)
+end;
 
-	return true
+-- A function to clear the panel list.
+function PANEL:Clear()
+	for _, v in next, self.Items do if IsValid(v) then v:Remove() end end
+	self.Items = {}
 end
 
-vgui.Register("cwPanelList", PANEL, "DCategoryList")
+vgui.Register("cwPanelList", PANEL, "DPanelList")

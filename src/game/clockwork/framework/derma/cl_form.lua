@@ -1,4 +1,3 @@
-
 local PANEL = {}
 
 -- A function to add a text entry.
