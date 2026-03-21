@@ -2006,6 +2006,8 @@ function PANEL:OnNext()
 			gender = GENDER_FEMALE
 		elseif gender == L(GENDER_NONE) then
 			gender = GENDER_NONE
+		else
+			gender = GENDER_MALE
 		end
 
 		if not faction and self.factionMultiChoice then
