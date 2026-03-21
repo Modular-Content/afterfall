@@ -1014,8 +1014,8 @@ else -- if (SERVER) then
 		info.skin = data.skin or 0
 		if skinBlacklist[info.skin] then info.skin = 0 end
 		info.tone = math.Clamp(data.tone or 0, -20, 20)
-		info.bodyGroups = {}
-		info.data = {BodyGroups = info.bodyGroups, Skin = info.skin, Pitch = info.tone} -- uhh
+		info.bodyGroups = pon.encode({})
+		info.data = {}
 
 		-- ???????
 		-- че за хуйня, ну типа прикинь клиент сам себе пушку так выдаст, сосите!
@@ -1137,6 +1137,10 @@ else -- if (SERVER) then
 
 			info.data["PhysDesc"] = cwKernel:ModifyPhysDesc(data.physDesc)
 		end
+
+		info.data['Skin'] = info.skin
+		info.data['Pitch'] = info.tone
+		info.data['BodyGroups'] = info.bodyGroups
 
 		if not factionTable.GetModel and not info.model then
 			return self:SetCreateFault(player, {"FaultNeedModel"})
@@ -4599,7 +4603,8 @@ else -- if (SERVER) then
 		end
 		
 		info.skin = character.data['Skin']
-		info.bodyGroups = character.data['BodyGroups']
+		if istable(character.data['BodyGroups']) then character.data['BodyGroups'] = pon.encode(character.data['BodyGroups']) end
+		info.bodyGroups = pon.decode(character.data['BodyGroups'] or '[}')
 
 		cwPlugin:Call("PlayerAdjustCharacterScreenInfo", player, character, info)
 		netstream.Start(player, "CharacterAdd", info)

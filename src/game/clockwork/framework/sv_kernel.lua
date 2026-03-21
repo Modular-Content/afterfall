@@ -1952,32 +1952,20 @@ end
 	@returns {Unknown}
 --]]
 function Clockwork:PlayerRestoreCharacterData(player, data)
-	if data["PhysDesc"] then
-		data["PhysDesc"] = cwKernel:ModifyPhysDesc(data["PhysDesc"])
-	end
-
-	if not data["LimbData"] then
-		data["LimbData"] = {}
-	end
-
-	if not data["Clothes"] then
-		data["Clothes"] = {}
-	end
-
-	if not data["Accessories"] then
-		data["Accessories"] = {}
-	end
-
-	if not data["Traits"] then
-		data["Traits"] = {}
-	end
-
+	if data["PhysDesc"] then data["PhysDesc"] = cwKernel:ModifyPhysDesc(data["PhysDesc"]) end
+	if not data['Skin'] then data['Skin'] = 0 end
+	if not data['BodyGroups'] then data['BodyGroups'] = {} end
+	if not data['Pitch'] then data['Pitch'] = 0 end
+	if not data["LimbData"] then data["LimbData"] = {} end
+	if not data["Clothes"] then data["Clothes"] = {} end
+	if not data["Accessories"] then data["Accessories"] = {} end
+	if not data["Traits"] then data["Traits"] = {} end
 	cwPly:RestoreCharacterData(player, data)
 end
 
 --[[
 	@codebase Server
-	@details Called when a player's limb damage is bIsHealed.
+	@details Called when a player's limb damage is healed.
 	@returns {Unknown}
 --]]
 function Clockwork:PlayerLimbDamageHealed(player, hitGroup, amount)
@@ -2859,7 +2847,7 @@ end
 function Clockwork:PlayerSetModel(player)
 	cwPly:SetDefaultModel(player)
 	cwPly:SetDefaultSkin(player)
-	local bodyGroups = player:GetCharacterData("BodyGroups", {})
+	local bodyGroups = pon.decode(player:GetCharacterData("BodyGroups", '[}'))
 	for k, v in next, (bodyGroups or {}) do
 		player:SetBodygroup(k, v)
 	end
@@ -4167,11 +4155,6 @@ function Clockwork:PlayerCharacterLoaded(player)
 	if playerFlags then
 		cwPly:GiveFlags(player, playerFlags)
 	end
-
-	-- because programirovanie digradirovalo
-	player:SetCharacterData('Pitch', player:GetCharacterData('Pitch', 0))
-	player:SetCharacterData('BodyGroups', player:GetCharacterData('BodyGroups', {}))
-	player:SetCharacterData('Skin', player:GetCharacterData('Skin', 0))
 end
 
 --[[

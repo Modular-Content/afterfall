@@ -45,6 +45,7 @@ if not r then require 'cwutil' end
 ClockworkLite = r and table.Merge(ClockworkLite, GM) or GM
 ---@class Clockwork : GM
 Clockwork = r and table.Merge(Clockwork or {}, ClockworkLite) or ClockworkLite
+AddCSLuaFile 'cl_preload.lua'
 AddCSLuaFile 'sh_preload.lua'
 include 'sh_preload.lua'
 local loadExternals = function()

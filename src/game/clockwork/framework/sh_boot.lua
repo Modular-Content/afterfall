@@ -96,6 +96,9 @@ end
 
 Clockwork.kernel:IncludeDirectory("commands/", true)
 Clockwork.player:AddCharacterData("PhysDesc", NWTYPE_STRING, "")
+Clockwork.player:AddCharacterData("Skin", NWTYPE_STRING, 0)
+Clockwork.player:AddCharacterData("BodyGroups", NWTYPE_STRING, pon.encode({}))
+Clockwork.player:AddCharacterData("Pitch", NWTYPE_NUMBER, 0)
 Clockwork.player:AddCharacterData("Model", NWTYPE_STRING, "")
 Clockwork.player:AddCharacterData("Flags", NWTYPE_STRING, "")
 Clockwork.player:AddCharacterData("Name", NWTYPE_STRING, "")

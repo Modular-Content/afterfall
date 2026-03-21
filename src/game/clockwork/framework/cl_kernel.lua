@@ -1509,7 +1509,7 @@ function ModularWork.Systems.Heartbeat()
 			end
 		end
 	end
-	if percent < 0.4 then
+	if percent < 0.2 then
 		if breathSound and breathSound:IsFading() then return end
 		if not breathSound or not breathSound:IsPlaying() then
 			breathSound = CreateSoundExt(ply, 'player/breathe1.wav')
@@ -1577,7 +1577,7 @@ function ModularWork.Systems.aDSP()
     local percent = hp / max
     local dsp = 0
 	-- как оригинально
-    if percent > .4 then dsp = 0 elseif percent > .3 then dsp = 30 elseif percent > .2 then dsp = 31 elseif percent > .1 then dsp = 5 else dsp = 26 end
+    if percent > .4 then dsp = 0 elseif percent > .3 then dsp = 30 elseif percent > .2 then dsp = 31 else dsp = 5 end
     if dsp ~= lastDSP then ply:SetDSP(dsp, false) lastDSP = dsp end
 end
 

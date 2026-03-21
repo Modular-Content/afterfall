@@ -17,6 +17,7 @@ MsgC(mC, r and '[ClockworkLite] Change detected! Refreshing...\n' or '[Clockwork
 ClockworkLite = r and table.Merge(ClockworkLite, GM) or GM
 ---@class Clockwork : GM
 Clockwork = r and table.Merge(Clockwork or {}, ClockworkLite) or ClockworkLite
+include 'cl_preload.lua'
 include 'sh_preload.lua'
 local loadExternals = function()
 	local files = file.Find('clockwork/gamemode/external/*.lua', 'LUA')
