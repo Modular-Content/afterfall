@@ -318,7 +318,7 @@ function Clockwork:PlayerThink(player, curTime, infoTable)
 	local doorPartners = cwEntity:GetDoorPartners(entity)
 
 	for k, v in pairs(doorPartners) do
-		if (not cwEntity:IsDoorLocked(v) and cwConfig:Get("bash_in_door_enabled"):Get()) and (not v.cwNextBashDoor or curTime >= v.cwNextBashDoor) then
+		if cwConfig:Get("bash_in_door_enabled"):Get() and (not v.cwNextBashDoor or curTime >= v.cwNextBashDoor) then
 			cwEntity:BashInDoor(v, player)
 			player:ViewPunch(Angle(math.Rand(-32, 32), math.Rand(-80, 80), math.Rand(-16, 16)))
 		end
@@ -401,7 +401,6 @@ function Clockwork:ClockworkInitialized()
 		cwCommand:SetHidden("StorageTakeCash", true)
 		cwCommand:SetHidden("StorageGiveCash", true)
 		cwConfig:Get("scale_prop_cost"):Set(0, nil, true, true)
-		cwConfig:Get("door_cost"):Set(0, nil, true, true)
 	end
 
 	if cwConfig:Get("use_own_group_system"):Get() then
@@ -509,33 +508,6 @@ end
 
 --[[
 	@codebase Server
-	@details Called when a player's unlock info is needed.
-	@param {Unknown} Missing description for player.
-	@param {Unknown} Missing description for entity.
-	@returns {Unknown}
---]]
-function Clockwork:PlayerGetUnlockInfo(player, entity)
-	if cwEntity:IsDoor(entity) then
-		local unlockTime = cwConfig:Get("unlock_time"):Get()
-
-		local leftArm = cwLimb:GetDamage(player, HITGROUP_LEFTARM, true)
-		local rightArm = cwLimb:GetDamage(player, HITGROUP_RIGHTARM, true)
-		local armDamage = math.max(leftArm, rightArm)
-		if armDamage > 0 then
-			unlockTime = unlockTime * (1 + armDamage)
-		end
-
-		return {
-			duration = unlockTime,
-			Callback = function(player, entity)
-				entity:Fire("unlock", "", 0)
-			end
-		}
-	end
-end
-
---[[
-	@codebase Server
 	@details Called when an Clockwork item has initialized.
 	@returns {Unknown}
 --]]
@@ -548,33 +520,6 @@ end
 	@param {Table} The table of items that have been initialized.
 --]]
 function Clockwork:ClockworkPostItemsInitialized(itemsTable)
-end
-
---[[
-	@codebase Server
-	@details Called when a player's lock info is needed.
-	@param {Unknown} Missing description for player.
-	@param {Unknown} Missing description for entity.
-	@returns {Unknown}
---]]
-function Clockwork:PlayerGetLockInfo(player, entity)
-	if cwEntity:IsDoor(entity) then
-		local lockTime = cwConfig:Get("lock_time"):Get()
-
-		local leftArm = cwLimb:GetDamage(player, HITGROUP_LEFTARM, true)
-		local rightArm = cwLimb:GetDamage(player, HITGROUP_RIGHTARM, true)
-		local armDamage = math.max(leftArm, rightArm)
-		if armDamage > 0 then
-			lockTime = lockTime * (1 + armDamage)
-		end
-
-		return {
-			duration = lockTime,
-			Callback = function(player, entity)
-				entity:Fire("lock", "", 0)
-			end
-		}
-	end
 end
 
 --[[
@@ -1629,20 +1574,6 @@ function Clockwork:InitPostEntity()
 					end
 				end
 			end
-
-			if cwEntity:IsDoor(v) then
-				local entIndex = v:EntIndex()
-
-				if not cwEntity.DoorEntities then
-					cwEntity.DoorEntities = {}
-				end
-
-				local doorEnts = cwEntity.DoorEntities
-
-				if not doorEnts[entIndex] then
-					doorEnts[entIndex] = v
-				end
-			end
 		end
 	end
 
@@ -2588,34 +2519,6 @@ end
 
 --[[
 	@codebase Server
-	@details Called when a player attempts to own a door.
-	@param {Unknown} Missing description for player.
-	@param {Unknown} Missing description for door.
-	@returns {Unknown}
---]]
-function Clockwork:PlayerCanOwnDoor(player, door)
-	if cwEntity:IsDoorUnownable(door) then
-		return false
-	else
-		return true
-	end
-end
-
---[[
-	@codebase Server
-	@details Called when a player attempts to view a door.
-	@param {Unknown} Missing description for player.
-	@param {Unknown} Missing description for door.
-	@returns {Unknown}
---]]
-function Clockwork:PlayerCanViewDoor(player, door)
-	if cwEntity:IsDoorUnownable(door) then return false end
-
-	return true
-end
-
---[[
-	@codebase Server
 	@details Called when a player attempts to holster a weapon.
 	@param {Unknown} Missing description for player.
 	@param {Unknown} Missing description for itemTable.
@@ -2850,33 +2753,6 @@ end
 
 --[[
 	@codebase Server
-	@details Called to check if a player does have door access.
-	@param {Unknown} Missing description for player.
-	@param {Unknown} Missing description for door.
-	@param {Unknown} Missing description for access.
-	@param {Unknown} Missing description for isAccurate.
-	@returns {Unknown}
---]]
-function Clockwork:PlayerDoesHaveDoorAccess(player, door, access, isAccurate)
-	if cwEntity:GetOwner(door) ~= player then
-		local key = player:GetCharacterKey()
-
-		if door.accessList and door.accessList[key] then
-			if isAccurate then
-				return door.accessList[key] == access
-			else
-				return door.accessList[key] >= access
-			end
-		end
-
-		return false
-	else
-		return true
-	end
-end
-
---[[
-	@codebase Server
 	@details Called to check if a player does know another player.
 	@param {Unknown} Missing description for player.
 	@param {Unknown} Missing description for target.
@@ -2891,54 +2767,10 @@ end
 
 --[[
 	@codebase Server
-	@details Called when a player attempts to lock an entity.
-	@param {Unknown} Missing description for player.
-	@param {Unknown} Missing description for entity.
-	@returns {Unknown}
---]]
-function Clockwork:PlayerCanLockEntity(player, entity)
-	if cwEntity:IsDoor(entity) then
-		return cwPly:HasDoorAccess(player, entity)
-	else
-		return true
-	end
-end
-
---[[
-	@codebase Server
 	@details Called when a player's class has been set.
 	@returns {Unknown}
 --]]
 function Clockwork:PlayerClassSet(player, newClass, oldClass, noRespawn, addDelay, model)
-end
-
---[[
-	@codebase Server
-	@details Called when a player attempts to unlock an entity.
-	@param {Unknown} Missing description for player.
-	@param {Unknown} Missing description for entity.
-	@returns {Unknown}
---]]
-function Clockwork:PlayerCanUnlockEntity(player, entity)
-	if cwEntity:IsDoor(entity) then
-		return cwPly:HasDoorAccess(player, entity)
-	else
-		return true
-	end
-end
-
---[[
-	@codebase Server
-	@details Called when a player attempts to use a door.
-	@param {Unknown} Missing description for player.
-	@param {Unknown} Missing description for door.
-	@returns {Unknown}
---]]
-function Clockwork:PlayerCanUseDoor(player, door)
-	if cwEntity:GetOwner(door) and not cwPly:HasDoorAccess(player, door) then return false end
-	if cwEntity:IsDoorFalse(door) then return false end
-
-	return true
 end
 
 --[[
@@ -4771,54 +4603,8 @@ end
 --]]
 function Clockwork:ShowTeam(ply)
 	if not cwPly:IsNoClipping(ply) then
-		local doRecogniseMenu = true
-		local entity = ply:GetEyeTraceNoCursor().Entity
-		local plyTable = player.GetAll()
-
-		if IsValid(entity) and cwEntity:IsDoor(entity) then
-			if entity:GetPos():Distance(ply:GetShootPos()) <= 192 then
-				if cwPlugin:Call("PlayerCanViewDoor", ply, entity) then
-					if cwPlugin:Call("PlayerUse", ply, entity) then
-						local owner = cwEntity:GetOwner(entity)
-
-						if IsValid(owner) then
-							if cwPly:HasDoorAccess(ply, entity, DOOR_ACCESS_COMPLETE) then
-								local data = {
-									sharedAccess = cwEntity:DoorHasSharedAccess(entity),
-									sharedText = cwEntity:DoorHasSharedText(entity),
-									unsellable = cwEntity:IsDoorUnsellable(entity),
-									accessList = {},
-									isParent = cwEntity:IsDoorParent(entity),
-									entity = entity,
-									owner = owner
-								}
-
-								for k, v in pairs(plyTable) do
-									if v ~= ply and v ~= owner then
-										if cwPly:HasDoorAccess(v, entity, DOOR_ACCESS_COMPLETE) then
-											data.accessList[v] = DOOR_ACCESS_COMPLETE
-										elseif cwPly:HasDoorAccess(v, entity, DOOR_ACCESS_BASIC) then
-											data.accessList[v] = DOOR_ACCESS_BASIC
-										end
-									end
-								end
-
-								netstream.Start(ply, "DoorManagement", data)
-							end
-						else
-							netstream.Start(ply, "PurchaseDoor", entity)
-						end
-					end
-				end
-
-				doRecogniseMenu = false
-			end
-		end
-
 		if cwConfig:Get("recognise_system"):Get() then
-			if doRecogniseMenu then
-				netstream.Start(ply, "RecogniseMenu", true)
-			end
+			netstream.Start(ply, "RecogniseMenu", true)
 		end
 	end
 end
@@ -5432,102 +5218,6 @@ netstream.Hook("GetQuizStatus", function(player, data)
 		netstream.Start(player, "QuizCompleted", true)
 	else
 		netstream.Start(player, "QuizCompleted", false)
-	end
-end)
-
--- DoorManagement netstream callback.
-netstream.Hook("DoorManagement", function(player, data)
-	if IsValid(data[1]) and player:GetEyeTraceNoCursor().Entity == data[1] then
-		if data[1]:GetPos():Distance(player:GetPos()) <= 192 then
-			if data[2] == "Purchase" then
-				if not cwEntity:GetOwner(data[1]) then
-					if hook.Call("PlayerCanOwnDoor", Clockwork, player, data[1]) then
-						local doors = cwPly:GetDoorCount(player)
-
-						if doors == cwConfig:Get("max_doors"):Get() then
-							cwPly:Notify(player, {"CannotPurchaseAnotherDoor"})
-						else
-							local doorCost = cwConfig:Get("door_cost"):Get()
-
-							if doorCost == 0 or cwPly:CanAfford(player, doorCost) then
-								local doorName = cwEntity:GetDoorName(data[1])
-
-								if doorName == "false" or doorName == "hidden" or doorName == "" then
-									doorName = "Door"
-								end
-
-								if doorCost > 0 then
-									cwPly:GiveCash(player, -doorCost, doorName)
-								end
-
-								cwPly:GiveDoor(player, data[1])
-							else
-								local amount = doorCost - player:GetCash()
-								player:NotifyMissingCash(amount)
-							end
-						end
-					end
-				end
-			elseif data[2] == "Access" then
-				if cwPly:HasDoorAccess(player, data[1], DOOR_ACCESS_COMPLETE) then
-					if IsValid(data[3]) and data[3] ~= player and data[3] ~= cwEntity:GetOwner(data[1]) then
-						if data[4] == DOOR_ACCESS_COMPLETE then
-							if cwPly:HasDoorAccess(data[3], data[1], DOOR_ACCESS_COMPLETE) then
-								cwPly:GiveDoorAccess(data[3], data[1], DOOR_ACCESS_BASIC)
-							else
-								cwPly:GiveDoorAccess(data[3], data[1], DOOR_ACCESS_COMPLETE)
-							end
-						elseif data[4] == DOOR_ACCESS_BASIC then
-							if cwPly:HasDoorAccess(data[3], data[1], DOOR_ACCESS_BASIC) then
-								cwPly:TakeDoorAccess(data[3], data[1])
-							else
-								cwPly:GiveDoorAccess(data[3], data[1], DOOR_ACCESS_BASIC)
-							end
-						end
-
-						if cwPly:HasDoorAccess(data[3], data[1], DOOR_ACCESS_COMPLETE) then
-							netstream.Start(player, "DoorAccess", {data[3], DOOR_ACCESS_COMPLETE})
-						elseif cwPly:HasDoorAccess(data[3], data[1], DOOR_ACCESS_BASIC) then
-							netstream.Start(player, "DoorAccess", {data[3], DOOR_ACCESS_BASIC})
-						else
-							netstream.Start(player, "DoorAccess", {data[3]})
-						end
-					end
-				end
-			elseif data[2] == "Unshare" then
-				if cwEntity:IsDoorParent(data[1]) then
-					if data[3] == "Text" then
-						netstream.Start(player, "SetSharedText", false)
-						data[1].cwDoorSharedTxt = nil
-					else
-						netstream.Start(player, "SetSharedAccess", false)
-						data[1].cwDoorSharedAxs = nil
-					end
-				end
-			elseif data[2] == "Share" then
-				if cwEntity:IsDoorParent(data[1]) then
-					if data[3] == "Text" then
-						netstream.Start(player, "SetSharedText", true)
-						data[1].cwDoorSharedTxt = true
-					else
-						netstream.Start(player, "SetSharedAccess", true)
-						data[1].cwDoorSharedAxs = true
-					end
-				end
-			elseif data[2] == "Text" and data[3] ~= "" then
-				if cwPly:HasDoorAccess(player, data[1], DOOR_ACCESS_COMPLETE) then
-					if not string.find(string.gsub(string.lower(data[3]), "%s", ""), "thisdoorcanbepurchased") and string.find(data[3], "%w") then
-						cwEntity:SetDoorText(data[1], string.utf8sub(data[3], 1, 32))
-					end
-				end
-			elseif data[2] == "Sell" then
-				if cwEntity:GetOwner(data[1]) == player then
-					if not cwEntity:IsDoorUnsellable(data[1]) then
-						cwPly:TakeDoor(player, data[1])
-					end
-				end
-			end
-		end
 	end
 end)
 

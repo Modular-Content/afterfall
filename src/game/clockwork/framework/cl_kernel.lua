@@ -917,22 +917,6 @@ end
 
 --[[
 	@codebase Client
-	@details Called when a player's door access name is needed.
---]]
-function Clockwork:GetPlayerDoorAccessName(player, door, owner)
-	return player:Name()
-end
-
---[[
-	@codebase Client
-	@details Called when a player should show on the door access list.
---]]
-function Clockwork:PlayerShouldShowOnDoorAccessList(player, door, owner)
-	return true
-end
-
---[[
-	@codebase Client
 	@details Called when a player should show on the scoreboard.
 --]]
 function Clockwork:PlayerShouldShowOnScoreboard(player)
@@ -2525,13 +2509,7 @@ function Clockwork:GetStatusInfo(player, text)
 	local action = cwPly:GetAction(player, true)
 
 	if action then
-		if not player:IsRagdolled() then
-			if action == "lock" then
-				table.insert(text, "[Locking]")
-			elseif action == "unlock" then
-				table.insert(text, "[Unlocking]")
-			end
-		elseif action == "unragdoll" then
+		if action == "unragdoll" then
 			if player:GetRagdollState() == RAGDOLL_FALLENOVER then
 				table.insert(text, "[Getting Up]")
 			else
@@ -2683,11 +2661,7 @@ function Clockwork:GetProgressBarInfo()
         end
     end
 	if action then
-    	if action == "lock" then
-    	    return {text = "Закрываем замок...", percentage = percentage, flash = percentage < 10}
-    	elseif action == "unlock" then
-    	    return {text = "Открываем замок...", percentage = percentage, flash = percentage < 10}
-    	elseif action == "unragdoll" then
+    	if action == "unragdoll" then
     	    if cwClient:GetRagdollState() == RAGDOLL_FALLENOVER then
     	        return {text = "Вы встаете...", percentage = percentage, flash = percentage < 10}
     	    else
@@ -3048,62 +3022,6 @@ end
 
 --[[
 	@codebase Client
-	@details Called when information about a door is needed.
-	@param {Unknown} Missing description for door.
-	@param {Unknown} Missing description for information.
-	@returns {Unknown}
---]]
-function Clockwork:GetDoorInfo(door, information)
-	local doorCost = cwConfig:Get("door_cost"):Get()
-	local owner = cwEntity:GetOwner(door)
-	local text = cwEntity:GetDoorText(door)
-	local name = cwEntity:GetDoorName(door)
-
-	if information == DOOR_INFO_NAME then
-		if cwEntity:IsDoorHidden(door) or cwEntity:IsDoorFalse(door) then
-			return false
-		elseif name == "" then
-			return "Door"
-		else
-			return name
-		end
-	elseif information == DOOR_INFO_TEXT then
-		if cwEntity:IsDoorUnownable(door) then
-			if not cwEntity:IsDoorHidden(door) and not cwEntity:IsDoorFalse(door) then
-				if text == "" then
-					return "UnownableDoorText"
-				else
-					return text
-				end
-			else
-				return false
-			end
-		elseif text ~= "" then
-			if not IsValid(owner) then
-				if doorCost > 0 then
-					return "PurchasableDoorText"
-				else
-					return "OwnableDoorText"
-				end
-			else
-				return text
-			end
-		elseif IsValid(owner) then
-			if doorCost > 0 then
-				return "PurchasedDoorText"
-			else
-				return "OwnedDoorText"
-			end
-		elseif doorCost > 0 then
-			return "PurchasableDoorText"
-		else
-			return "OwnableDoorText"
-		end
-	end
-end
-
---[[
-	@codebase Client
 	@details Called to get whether or not a post process is permitted.
 	@param {Unknown} Missing description for class.
 	@returns {Unknown}
@@ -3121,24 +3039,6 @@ end
 --]]
 function Clockwork:PostDrawTranslucentRenderables(bDrawingDepth, bDrawingSkybox)
 	if bDrawingSkybox or bDrawingDepth then return end
-	local colorWhite = cwOption:GetColor("white")
-	local colorInfo = cwOption:GetColor("information")
-	local doorFont = cwOption:GetFont("large_3d_2d")
-	local eyeAngles = EyeAngles()
-	local eyePos = EyePos()
-
-	if not cwKernel:IsChoosingCharacter() then
-		cam.Start3D(eyePos, eyeAngles)
-		local entities = ents.FindInSphere(eyePos, 256)
-
-		for k, v in pairs(entities) do
-			if IsValid(v) and cwEntity:IsDoor(v) then
-				cwKernel:DrawDoorText(v, eyePos, eyeAngles, doorFont, colorInfo, colorWhite)
-			end
-		end
-
-		cam.End3D()
-	end
 end
 
 --[[

@@ -2770,53 +2770,6 @@ else -- if (SERVER) then
 
 	--[[
 	@codebase Shared
-	@details A function to take a door from a player.
-	@param {Unknown} Missing description for player.
-	@param {Unknown} Missing description for door.
-	@param {Unknown} Missing description for shouldForce.
-	@param {Unknown} Missing description for thisDoorOnly.
-	@param {Unknown} Missing description for childrenOnly.
-	@returns {Unknown}
---]]
-	function Clockwork.player:TakeDoor(player, door, shouldForce, thisDoorOnly, childrenOnly)
-		local doorCost = cwCfg:Get("door_cost"):Get()
-
-		if not thisDoorOnly then
-			local doorParent = cwEntity:GetDoorParent(door)
-
-			if not doorParent or childrenOnly then
-				for k, v in pairs(cwEntity:GetDoorChildren(door)) do
-					if IsValid(v) then
-						self:TakeDoor(player, v, true, true)
-					end
-				end
-			else
-				return self:TakeDoor(player, doorParent, shouldForce)
-			end
-		end
-
-		if cwPlugin:Call("PlayerCanUnlockEntity", player, door) then
-			door:Fire("Unlock", "", 0)
-			door:EmitSound("doors/door_latch3.wav")
-		end
-
-		cwEntity:SetDoorText(door, false)
-		self:TakeProperty(player, door)
-		cwPlugin:Call("PlayerDoorTaken", player, door)
-
-		if door:GetClass() == "prop_dynamic" then
-			if not door:IsMapEntity() then
-				door:Remove()
-			end
-		end
-
-		if not force and doorCost > 0 then
-			self:GiveCash(player, doorCost / 2, {"CashSellDoor"})
-		end
-	end
-
-	--[[
-	@codebase Shared
 	@details A function to make a player say text as a radio broadcast.
 	@param {Unknown} Missing description for player.
 	@param {Unknown} Missing description for text.
@@ -2877,43 +2830,6 @@ else -- if (SERVER) then
 --]]
 	function Clockwork.player:GetFactionTable(player)
 		return cwFaction:GetAll()[player:GetFaction()]
-	end
-
-	--[[
-	@codebase Shared
-	@details A function to give a door to a player.
-	@param {Unknown} Missing description for player.
-	@param {Unknown} Missing description for door.
-	@param {Unknown} Missing description for name.
-	@param {Unknown} Missing description for unsellable.
-	@param {Unknown} Missing description for override.
-	@returns {Unknown}
---]]
-	function Clockwork.player:GiveDoor(player, door, name, unsellable, override)
-		if cwEntity:IsDoor(door) then
-			local doorParent = cwEntity:GetDoorParent(door)
-
-			if doorParent and not override then
-				self:GiveDoor(player, doorParent, name, unsellable)
-			else
-				for k, v in pairs(cwEntity:GetDoorChildren(door)) do
-					if IsValid(v) then
-						self:GiveDoor(player, v, name, unsellable, true)
-					end
-				end
-
-				door.unsellable = unsellable
-				door.accessList = {}
-				cwEntity:SetDoorText(door, name or "PurchasedDoorText")
-				self:GiveProperty(player, door, true)
-				cwPlugin:Call("PlayerDoorGiven", player, door)
-
-				if cwPlugin:Call("PlayerCanUnlockEntity", player, door) then
-					door:EmitSound("doors/door_latch3.wav")
-					door:Fire("Unlock", "", 0)
-				end
-			end
-		end
 	end
 
 	--[[
@@ -3478,63 +3394,6 @@ else -- if (SERVER) then
 		end
 
 		return count
-	end
-
-	--[[
-	@codebase Shared
-	@details A function to take a player's door access.
-	@param {Unknown} Missing description for player.
-	@param {Unknown} Missing description for door.
-	@returns {Unknown}
---]]
-	function Clockwork.player:TakeDoorAccess(player, door)
-		if door.accessList then
-			door.accessList[player:GetCharacterKey()] = false
-		end
-	end
-
-	--[[
-	@codebase Shared
-	@details A function to give a player door access.
-	@param {Unknown} Missing description for player.
-	@param {Unknown} Missing description for door.
-	@param {Unknown} Missing description for access.
-	@returns {Unknown}
---]]
-	function Clockwork.player:GiveDoorAccess(player, door, access)
-		local key = player:GetCharacterKey()
-
-		if not door.accessList then
-			door.accessList = {
-				[key] = access
-			}
-		else
-			door.accessList[key] = access
-		end
-	end
-
-	--[[
-	@codebase Shared
-	@details A function to check if a player has door access.
-	@param {Unknown} Missing description for player.
-	@param {Unknown} Missing description for door.
-	@param {Unknown} Missing description for access.
-	@param {Unknown} Missing description for isAccurate.
-	@returns {Unknown}
---]]
-	function Clockwork.player:HasDoorAccess(player, door, access, isAccurate)
-		if not access then
-			return self:HasDoorAccess(player, door, DOOR_ACCESS_BASIC, isAccurate)
-		else
-			local doorParent = cwEntity:GetDoorParent(door)
-			local key = player:GetCharacterKey()
-
-			if doorParent and cwEntity:DoorHasSharedAccess(doorParent) and (not door.accessList or door.accessList[key] == nil) then
-				return cwPlugin:Call("PlayerDoesHaveDoorAccess", player, doorParent, access, isAccurate)
-			else
-				return cwPlugin:Call("PlayerDoesHaveDoorAccess", player, door, access, isAccurate)
-			end
-		end
 	end
 
 	--[[
