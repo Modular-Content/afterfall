@@ -267,6 +267,7 @@ CW_RUSSIAN["QuickMenuFallOver"] = "Упасть"
 CW_RUSSIAN["QuickMenuDescription"] = "Физическое описание"
 CW_RUSSIAN["CharacterMenuSubTitle"] = "Ролевой режим по вселенной Half-Life 2 на базе Clockwork 2015."
 CW_RUSSIAN["CharacterMenuAuthorLabel"] = "Игровой режим полностью модифицирован."
+-- CW_RUSSIAN['ChatCooldown'] = 'Вы не можете использовать #1 чат еще #2 секунд(ы)!'
 CW_RUSSIAN["CharacterMenuAbout"] = "НАШ САЙТ"
 CW_RUSSIAN["CharacterMenuNew"] = "СОЗДАТЬ ПЕРСОНАЖА"
 CW_RUSSIAN["DeleteCharacterConfirmation"] = "Вы собираетесь безвозвратно удалить персонажа \"#1\". Вы уверены?"

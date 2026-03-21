@@ -149,6 +149,10 @@ function playerMeta:NotifyMissingCash(amountMissing)
 	self:Notify({"YouNeedAnother", Clockwork.kernel:FormatCash(amountMissing, nil, true)})
 end
 
+function playerMeta:Notify(text, class, icon)
+	cwPly:Notify(self, text, class, icon)
+end
+
 -- A function to get whether a player has a trait.
 function playerMeta:HasTrait(uniqueID)
 	local traits = self:GetCharacterData("Traits")

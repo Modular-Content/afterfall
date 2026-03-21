@@ -5401,6 +5401,13 @@ end)
 
 -- LocalPlayerCreated netstream callback.
 netstream.Hook("LocalPlayerCreated", function(player, data)
+	-- сделать PlayerFinishedLoading - нет
+	-- сделать PlayerReadyForInfo - нет
+	-- сделать OnNetworkReady - нет
+	-- сделать всратый PlayerInitialSpawn - нет
+	-- но сделать максимально уебанский LocalPlayerCreated - да
+
+	-- я позже переделаю это говно, а пока так, чтобы не сломать ничего
 	if IsValid(player) and not player:HasConfigInitialized() then
 		cwKernel:CreateTimer("SendCfg" .. player:UniqueID(), FrameTime(), 1, function()
 			if IsValid(player) then
@@ -5679,7 +5686,8 @@ AddCSLuaFile("meta/cl_entity.lua")
 AddCSLuaFile("meta/cl_weapon.lua")
 Clockwork.kernel:IncludePrefixed("meta/sv_entity.lua")
 Clockwork.kernel:IncludePrefixed("meta/sv_player.lua")
-concommand.Add("gm_save", function(ply) end)
+-- concommand.Add("gm_save", function(ply) end)
+concommand.Remove 'gm_save'
 
 concommand.Add("cwStatus", function(ply, command, arguments)
 	local plyTable = player.GetAll()
@@ -5727,7 +5735,20 @@ function Clockwork:PlayerSay(player, text, bPublic)
 	end
 end
 
+local cooldowns = {}
+local function triggerCooldown(ply, id, delay)
+	if cooldowns[ply] and cooldowns[ply][id] then
+		local curTime = CurTime()
+		if cooldowns[ply][id] > curTime then return cooldowns[ply][id] - curTime end
+	end
+	cooldowns[ply] = cooldowns[ply] or {}
+	cooldowns[ply][id] = CurTime() + delay
+	return nil
+end
+
 function ClockworkPlayerSay(player, text)
+	local cooldown = triggerCooldown(player, 'mwchat', 1)
+	if cooldown then return end
 	CLOCKWORK_PLAYERSAY_OVERRIDE = true
 	text = hook.Call("PlayerSay", Clockwork, player, text, true)
 	CLOCKWORK_PLAYERSAY_OVERRIDE = nil

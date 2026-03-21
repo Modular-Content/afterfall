@@ -268,6 +268,7 @@ CW_ENGLISH["QuickMenuFallOver"] = "Fall Over"
 CW_ENGLISH["QuickMenuDescription"] = "Physical Description"
 CW_ENGLISH["CharacterMenuSubTitle"] = "Roleplay mode based on the Half-Life 2 universe using Clockwork 2015."
 CW_ENGLISH["CharacterMenuAuthorLabel"] = "The game mode is fully modified."
+-- CW_ENGLISH['ChatCooldown'] = 'You cannot use the #1 chat for another #2 second(s)!'
 CW_ENGLISH["CharacterMenuAbout"] = "OUR WEBSITE"
 CW_ENGLISH["CharacterMenuNew"] = "NEW CHARACTER"
 CW_ENGLISH["DeleteCharacterConfirmation"] = "You are about to permanently delete the character \"#1\". Are you sure?"
