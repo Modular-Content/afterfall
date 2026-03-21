@@ -1437,7 +1437,7 @@ function ModularWork.Systems.MenuMusic()
 	if not cwCharacter:IsPanelOpen() then
 		if menuMusicSound then
 			if menuMusicSound:IsPlaying() then
-				menuMusicSound:FadeOut(4)
+				menuMusicSound:FadeOut(8)
 			else
 				menuMusicSound = nil
 			end
@@ -1445,7 +1445,7 @@ function ModularWork.Systems.MenuMusic()
 		return
 	end
 	if deathMusicSound and deathMusicSound:IsPlaying() then return end
-	if not menuMusicSound then
+	if not menuMusicSound or not menuMusicSound:IsPlaying() then
 		local track = GetNextMusic()
 		menuMusicSound = CreateSoundExt(client, track)
 		menuMusicSound:SetSoundLevel(0)
@@ -1490,7 +1490,8 @@ function ModularWork.Systems.Heartbeat()
 	if max <= 0 then return end
 	local percent = hp / max
 	if percent < 0.6 then
-		if not heartbeatSound then
+		if heartbeatSound and heartbeatSound:IsFading() then return end
+		if not heartbeatSound or not heartbeatSound:IsPlaying() then
 			heartbeatSound = CreateSoundExt(ply, 'player/heartbeat1.wav')
 			heartbeatSound:SetSoundLevel(0)
 			heartbeatSound:PlayEx(0.2,100)
@@ -1509,7 +1510,8 @@ function ModularWork.Systems.Heartbeat()
 		end
 	end
 	if percent < 0.4 then
-		if not breathSound then
+		if breathSound and breathSound:IsFading() then return end
+		if not breathSound or not breathSound:IsPlaying() then
 			breathSound = CreateSoundExt(ply, 'player/breathe1.wav')
 			breathSound:SetSoundLevel(0)
 			breathSound:PlayEx(0.2,100)

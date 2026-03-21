@@ -151,7 +151,7 @@ end
 
 -- A function to get a player's maximum armor.
 function playerMeta:GetMaxArmor(armor)
-	local maxArmor = self:GetNetVar("MaxAP")
+	local maxArmor = self:GetNetVar("MaxAP", 0)
 
 	if maxArmor > 0 then
 		return maxArmor
@@ -162,7 +162,7 @@ end
 
 -- A function to get a player's maximum health.
 function playerMeta:GetMaxHealth(health)
-	local maxHealth = self:GetNetVar("MaxHP")
+	local maxHealth = self:GetNetVar("MaxHP", 0)
 
 	if maxHealth > 0 then
 		return maxHealth

@@ -4170,9 +4170,10 @@ function Clockwork:PlayerCharacterLoaded(player)
 		cwPly:GiveFlags(player, playerFlags)
 	end
 
-	-- че я туплю
-	-- player:SetSkin(player:QueryCharacter("skin", 0))
-	-- player:SetBodyGroups(player:QueryCharacter("bodyGroups", ""))
+	-- because programirovanie digradirovalo
+	player:SetCharacterData('Pitch', player:GetCharacterData('Pitch', 0))
+	player:SetCharacterData('BodyGroups', player:GetCharacterData('BodyGroups', {}))
+	player:SetCharacterData('Skin', player:GetCharacterData('Skin', 0))
 end
 
 --[[
